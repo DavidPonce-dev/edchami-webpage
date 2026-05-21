@@ -15,9 +15,9 @@ export default function Home() {
         <DescriptionSection
           title="Sobre Mí"
           paragraphs={[
-            "Desarrollador Full Stack apasionado por crear aplicaciones web escalables y soluciones IoT.",
-            "Experiencia en tecnologías modernas de frontend y backend, con enfoque en arquitectura limpia y buenas prácticas.",
-            "Siempre aprendiendo y explorando nuevas tecnologías para resolver problemas reales.",
+            "Desarrollador Full Stack con experiencia en la creación de aplicaciones web escalables y soluciones IoT.",
+            "Trabajo con tecnologías modernas de frontend y backend, priorizando la arquitectura limpia y las buenas prácticas de desarrollo.",
+            "En constante aprendizaje y exploración de nuevas tecnologías para resolver problemas del mundo real.",
           ]}
         />
         <SkillsSection title="Habilidades" />

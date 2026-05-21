@@ -37,7 +37,7 @@ export default function NotFound() {
           La URL {currentUrl} no existe
         </p>
         <p className="mt-6 text-base leading-7 text-gray-600 sm:text-lg lg:text-xl">
-          No pudimos encontrar lo que buscás.
+          No pudimos encontrar lo que busca.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-y-4 sm:flex-row sm:gap-x-6">
           <Link

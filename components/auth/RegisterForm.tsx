@@ -19,9 +19,9 @@ interface FieldErrors {
 }
 
 const registerSchema = z.object({
-  email: z.email('Email inválido'),
+  email: z.email('Correo electrónico no válido'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
-  confirmPassword: z.string().min(1, 'Confirmá tu contraseña'),
+  confirmPassword: z.string().min(1, 'Por favor confirme su contraseña'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Las contraseñas no coinciden',
   path: ['confirmPassword'],
@@ -51,7 +51,7 @@ export function RegisterForm() {
 
   useEffect(() => {
     if (state?.success === false) {
-      toast.error(state.message ?? 'An error occurred');
+      toast.error(state.message ?? 'Ha ocurrido un error');
     }
   }, [state]);
 
@@ -144,7 +144,7 @@ export function RegisterForm() {
         </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          ¿Ya tenés cuenta?{' '}
+          ¿Ya tiene una cuenta?{' '}
           <Link href="/login" className="text-accent hover:underline font-medium">
             Inicia sesión
           </Link>

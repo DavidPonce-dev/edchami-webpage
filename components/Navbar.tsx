@@ -21,7 +21,7 @@ function getSnapshot() {
 }
 
 const navLinks = [
-  { name: "Home", href: "/" },
+  { name: "Inicio", href: "/" },
   { name: "Proyectos", href: "/projects" },
   { name: "Contacto", href: "/contact" },
 ];
