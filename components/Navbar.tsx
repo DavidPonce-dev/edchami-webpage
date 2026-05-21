@@ -220,7 +220,7 @@ export function Navbar({ user }: NavbarProps) {
                     className={`block py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
                       isActive(href)
                         ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
-                        : "text-nav-text hover:bg-nav-accent-blue-soft hover:text-nav-accent-blue dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                        : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
                     }`}
                   >
                     {name}

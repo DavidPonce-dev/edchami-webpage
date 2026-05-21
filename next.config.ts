@@ -14,6 +14,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  serverExternalPackages: ["typeorm", "pg", "reflect-metadata"],
   images: {
     remotePatterns: [
       {

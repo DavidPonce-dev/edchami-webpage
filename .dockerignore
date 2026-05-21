@@ -4,7 +4,6 @@
 Dockerfile
 docker-compose*.yml
 .env*.local
-.env
 node_modules
 .next
 .vscode

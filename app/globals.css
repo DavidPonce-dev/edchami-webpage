@@ -52,8 +52,8 @@
   --nav-toggle-foreground: #ffffff;
   --nav-accent-blue: #1565c0;
   --nav-accent-burgundy: #880e4f;
-  --nav-accent-blue-soft: rgba(21, 101, 192, 0.15);
-  --nav-accent-burgundy-soft: rgba(136, 14, 79, 0.15);
+  --nav-accent-blue-soft: rgba(21, 101, 192, 0.35);
+  --nav-accent-burgundy-soft: rgba(136, 14, 79, 0.35);
   --nav-gradient-start: #1565c0;
   --nav-gradient-end: #880e4f;
   --hero: #388e3c;
