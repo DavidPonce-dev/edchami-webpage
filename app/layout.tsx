@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -18,18 +17,31 @@ interface RootLayoutProps {
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const user = await getUser();
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value;
-  const isDark = theme === "dark";
 
   return (
-    <html lang="en" className={`h-full antialiased${isDark ? " dark" : ""}`}>
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
           rel="stylesheet"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = document.cookie.match(/theme=(dark|light)/);
+                  if (theme) {
+                    if (theme[1] === 'dark') document.documentElement.classList.add('dark');
+                  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
         />
       </head>
       <body className="min-h-full flex flex-col">
