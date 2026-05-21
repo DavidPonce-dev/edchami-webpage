@@ -52,7 +52,9 @@ export function Navbar({ user }: NavbarProps) {
   return (
     <>
       <div className="w-full h-13" />
-      <nav className="fixed h-13 top-0 left-0 z-50 w-full bg-green-700 dark:bg-gray-900 shadow-lg shadow-slate-600/50 dark:shadow-black/50">
+      <nav className="fixed h-13 top-0 left-0 z-50 w-full bg-nav dark:bg-nav-surface shadow-lg shadow-slate-600/50 dark:shadow-black/50">
+        {/* Accent gradient line (blue → burgundy, light mode only) */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-nav-accent-blue via-purple-600 to-nav-accent-burgundy opacity-60 dark:opacity-0" />
         <div className="max-w-screen-xl px-4 py-2 flex flex-col md:flex-row items-center justify-between mx-auto">
           <div className="flex justify-between w-full">
             {/* Logo */}
@@ -60,7 +62,7 @@ export function Navbar({ user }: NavbarProps) {
             {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
-              className="w-8 h-8 me-3 flex items-center justify-center rounded-full bg-purple-900/80 dark:bg-blue-300/80 hover:opacity-80 text-white dark:text-gray-900 transition-opacity"
+              className="w-8 h-8 me-3 mt-1 flex items-center justify-center rounded-full bg-nav-toggle dark:bg-nav-toggle hover:opacity-80 text-nav-toggle-foreground dark:text-nav-toggle-foreground transition-opacity"
               aria-label="Toggle dark mode"
             >
               {darkMode ? (
@@ -104,7 +106,7 @@ export function Navbar({ user }: NavbarProps) {
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-1 px-3 py-2 text-sm text-white/90 hover:bg-green-800/50 dark:hover:bg-gray-800 rounded-md transition-colors"
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-nav-text/90 hover:bg-nav-surface-hover dark:hover:bg-gray-800 rounded-md transition-colors"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -164,13 +166,13 @@ export function Navbar({ user }: NavbarProps) {
               <div className="hidden sm:flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="px-3 py-1.5 text-sm text-white/90 hover:bg-green-800/50 rounded-md transition-colors"
+                  className="px-3 py-1.5 text-sm text-nav-text/90 hover:bg-nav-surface-hover rounded-md transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="px-3 py-1.5 text-sm bg-white/20 hover:bg-white/30 text-white rounded-md transition-colors font-medium"
+                  className="px-3 py-1.5 text-sm bg-nav-text/20 hover:bg-nav-text/30 text-nav-text-active rounded-md transition-colors font-medium"
                 >
                   Register
                 </Link>
@@ -182,7 +184,7 @@ export function Navbar({ user }: NavbarProps) {
             {/* Mobile hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex p-2 w-10 h-10 justify-center text-sm text-slate-100 rounded-lg md:hidden hover:bg-green-800/50 focus:outline-none focus:ring-2 focus:ring-green-300"
+              className="inline-flex p-2 w-10 h-10 justify-center text-sm text-nav-text rounded-lg md:hidden hover:bg-nav-surface-hover focus:outline-none focus:ring-2 focus:ring-nav-ring"
               aria-controls="navbar"
               aria-expanded={isOpen}
             >
@@ -209,7 +211,7 @@ export function Navbar({ user }: NavbarProps) {
             className={`w-full md:block md:w-auto ${isOpen ? "block" : "hidden"}`}
             id="navbar"
           >
-            <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-green-600/30 rounded-lg md:space-x-6 rtl:space-x-reverse md:flex-row md:mt-1 md:border-0 bg-green-800/50 md:bg-transparent dark:bg-gray-800/50 md:dark:bg-transparent dark:border-gray-700/50">
+            <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-nav-border rounded-lg md:space-x-6 rtl:space-x-reverse md:flex-row md:mt-1 md:border-0 bg-nav-menu-surface dark:bg-nav-menu-surface md:bg-transparent dark:md:bg-transparent dark:border-gray-700/50">
               {navLinks.map(({ name, href }) => (
                 <li key={name}>
                   <Link
@@ -217,8 +219,8 @@ export function Navbar({ user }: NavbarProps) {
                     href={href}
                     className={`block py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
                       isActive(href)
-                        ? "text-white bg-green-800 md:bg-transparent md:text-green-100 dark:md:text-green-400"
-                        : "text-green-100 hover:bg-green-600/50 dark:text-gray-300 dark:hover:bg-gray-700/50"
+                        ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
+                        : "text-nav-text hover:bg-nav-accent-blue-soft hover:text-nav-accent-blue dark:text-nav-text dark:hover:bg-nav-surface-hover"
                     }`}
                   >
                     {name}
@@ -226,13 +228,13 @@ export function Navbar({ user }: NavbarProps) {
                 </li>
               ))}
 
-              {/* Mobile-only auth links */}
+              {/* Mobile-only auth links 
               {!user && (
-                <li className="sm:hidden border-t border-green-600/30 dark:border-gray-700/50 pt-2 mt-2">
+                <li className="sm:hidden border-t border-nav-border dark:border-gray-700/50 pt-2 mt-2">
                   <Link
                     onClick={() => setIsOpen(false)}
                     href="/login"
-                    className="block py-2 px-3 text-center text-green-100 hover:bg-green-600/50 rounded font-retro text-xs"
+                    className="block py-2 px-3 text-center text-nav-text hover:bg-nav-surface-hover rounded font-retro text-xs"
                   >
                     Login
                   </Link>
@@ -243,12 +245,13 @@ export function Navbar({ user }: NavbarProps) {
                   <Link
                     onClick={() => setIsOpen(false)}
                     href="/register"
-                    className="block py-2 px-3 text-center bg-white/20 text-white rounded font-retro text-xs"
+                    className="block py-2 px-3 text-center bg-nav-text/20 text-nav-text-active rounded font-retro text-xs"
                   >
                     Register
                   </Link>
                 </li>
               )}
+              */}
             </ul>
           </div>
         </div>

@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, signToken, signRefreshToken } from "@/lib/jwt";
 import { User } from "@/types/user";
-import { validateCSRF } from "@/lib/csrf";
 import {
   accessTokenCookieOptions,
   refreshTokenCookieOptions,
 } from "@/lib/settings";
 
 export async function POST(request: NextRequest) {
-  if (!validateCSRF(request))
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-
   const authToken = request.cookies.get("auth_token")?.value || "";
   const refreshToken = request.cookies.get("refresh_token")?.value || "";
 

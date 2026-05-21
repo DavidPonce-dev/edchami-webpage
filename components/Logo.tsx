@@ -36,7 +36,7 @@ export function Logo({ className = "" }: LogoProps) {
         <rect x="24" y="24" width="4" height="4" className="fill-white dark:fill-green-400" />
       </svg>
 
-      <span className="font-retro text-sm text-white dark:text-green-400 hidden sm:inline">
+      <span className="font-retro text-sm text-nav-text-active dark:text-nav-text-active hidden sm:inline">
         EdChami
       </span>
     </Link>
