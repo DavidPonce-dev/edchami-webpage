@@ -16,126 +16,108 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="w-full py-2.5 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+      className="w-full py-2 px-4 bg-accent text-accent-foreground font-semibold rounded-md hover:opacity-90 transition text-xs"
     >
-      {pending ? "Signing in..." : "Sign in"}
+      {pending ? "Ingresando..." : "Ingresar"}
     </button>
   );
 }
 
 export function LoginForm() {
-  
   const [, formAction] = useActionState(loginAction, null);
 
   return (
-    <div className="bg-card border border-border rounded-lg shadow-lg p-8">
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-semibold text-card-foreground">
-          Welcome Back
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Sign in to your account
-        </p>
-      </div>
+    <div className="flex items-center justify-center p-4">
+      <div className="max-w-md w-full dark:bg-card p-8 rounded-lg shadow-md bg-card border border-border">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-foreground">
+          Iniciar sesión
+        </h2>
 
-      {/* Formulario de login con email y contraseña. */}
-      <form action={formAction} className="space-y-4">
-        <FormField
-          label="Email"
-          id="email"
-          name="email"
-          type="email"
-          placeholder="you@example.com"
-          required
-          autoComplete="email"
-          icon={<MailIcon className="w-5 h-5" />}
-        />
-
-        <div className="space-y-1.5">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-foreground"
-          >
-            Password <span className="text-destructive">*</span>
-          </label>
-          <PasswordInput
-            id="password"
-            name="password"
-            placeholder="••••••••"
+        <form action={formAction} className="space-y-6">
+          <FormField
+            label="Email"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="ejemplo@correo.com"
             required
-            autoComplete="current-password"
+            autoComplete="email"
+            icon={<MailIcon className="w-5 h-5" />}
           />
+
+          <div className="space-y-1.5">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-foreground"
+            >
+              Contraseña <span className="text-destructive">*</span>
+            </label>
+            <PasswordInput
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              required
+              autoComplete="current-password"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="remember"
+              name="remember"
+              type="checkbox"
+              className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-ring"
+            />
+            <label htmlFor="remember" className="ml-2 text-xs text-foreground">
+              Recordar este dispositivo (30 días)
+            </label>
+          </div>
+
+          <SubmitButton />
+        </form>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          ¿No tenés cuenta?{" "}
+          <Link
+            href="/register"
+            className="text-accent hover:underline font-medium"
+          >
+            Regístrate aquí
+          </Link>
+        </p>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              O continuar con
+            </span>
+          </div>
         </div>
 
-        {/* Opción "recordarme" para sesión extendida y dispositivo de confianza. */}
-        <div className="flex items-center">
-          <input
-            id="remember"
-            name="remember"
-            type="checkbox"
-            className="h-4 w-4 rounded border-border bg-background text-primary focus:ring-ring"
-          />
-          <label htmlFor="remember" className="ml-2 text-sm text-foreground">
-            Remember this device (30 days)
-          </label>
-        </div>
-
-        <SubmitButton />
-      </form>
-
-      {/* Enlace a recuperación de contraseña. */}
-      <p className="mt-4 text-center text-sm">
-        <Link
-          href="/forgot-password"
-          className="text-muted-foreground hover:text-foreground hover:underline"
-        >
-          Forgot password?
-        </Link>
-      </p>
-
-      {/* Separador para métodos de autenticación alternativos. */}
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">
-            Or continue with
-          </span>
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href={`${
+              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+            }/api/auth/oauth/google`}
+            className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors text-xs"
+          >
+            <GoogleIcon className="w-5 h-5" />
+            <span className="font-medium">Google</span>
+          </a>
+          <a
+            href={`${
+              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+            }/api/auth/oauth/github`}
+            className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors text-xs"
+          >
+            <GitHubIcon className="w-5 h-5" />
+            <span className="font-medium">GitHub</span>
+          </a>
         </div>
       </div>
-
-      {/* Botones de OAuth (Google y GitHub). */}
-      <div className="grid grid-cols-2 gap-3">
-        <a
-          href={`${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/api/auth/oauth/google`}
-          className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors"
-        >
-          <GoogleIcon className="w-5 h-5" />
-          <span className="text-sm font-medium">Google</span>
-        </a>
-        <a
-          href={`${
-            process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-          }/api/auth/oauth/github`}
-          className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors"
-        >
-          <GitHubIcon className="w-5 h-5" />
-          <span className="text-sm font-medium">GitHub</span>
-        </a>
-      </div>
-
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/register"
-          className="text-primary font-medium hover:underline"
-        >
-          Sign up
-        </Link>
-      </p>
     </div>
   );
 }

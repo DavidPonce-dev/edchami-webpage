@@ -1,29 +1,27 @@
-import Link from "next/link";
+import HeroSection from "@/components/home/HeroSection";
+import DescriptionSection from "@/components/home/DescriptionSection";
+import SkillsSection from "@/components/home/SkillsSection";
 
 export default function Home() {
   return (
-    <main className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-      <h1 className="text-5xl font-bold tracking-tight text-foreground mb-4">
-        Auth System
-      </h1>
-      <p className="text-lg text-muted-foreground max-w-md mb-8">
-        Secure authentication template built with Next.js 16. Ready to use as a
-        foundation for your next project.
-      </p>
-      <div className="flex gap-4">
-        <Link
-          href="/register"
-          className="px-6 py-3 bg-primary text-primary-foreground rounded-md font-medium hover:opacity-90 transition-opacity"
-        >
-          Get Started
-        </Link>
-        <Link
-          href="/login"
-          className="px-6 py-3 bg-background border border-border text-foreground rounded-md font-medium hover:bg-muted transition-colors"
-        >
-          Sign In
-        </Link>
+    <>
+      <HeroSection
+        name="Eduardo Chami"
+        titles={["Desarrollador Full Stack", "Desarrollador IoT"]}
+        interests={["Hardware", "Robótica"]}
+        imageUrl="https://i.ytimg.com/vi/q5tjvJz87rw/maxresdefault.jpg"
+      />
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        <DescriptionSection
+          title="Sobre Mí"
+          paragraphs={[
+            "Desarrollador Full Stack apasionado por crear aplicaciones web escalables y soluciones IoT.",
+            "Experiencia en tecnologías modernas de frontend y backend, con enfoque en arquitectura limpia y buenas prácticas.",
+            "Siempre aprendiendo y explorando nuevas tecnologías para resolver problemas reales.",
+          ]}
+        />
+        <SkillsSection title="Habilidades" />
       </div>
-    </main>
+    </>
   );
 }

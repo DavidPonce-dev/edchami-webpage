@@ -2,48 +2,85 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Material Design Color System
+ * Hierarchy: Black (dominant) > Green (primary) > Blue (secondary) > Burgundy (accent)
+ *
+ * Fonts:
+ *   Press Start 2P  — Titles, headings, nav links (retro pixel)
+ *   JetBrains Mono  — Body text, paragraphs, forms, labels (professional monospace)
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Black / Neutral (dominant) */
+  --background: #f5f5f5;
+  --foreground: #212121;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --primary: #2563eb;
+  --card-foreground: #212121;
+  --muted: #e0e0e0;
+  --muted-foreground: #616161;
+  --border: #bdbdbd;
+  --input: #e0e0e0;
+
+  /* Green (primary) */
+  --primary: #2e7d32;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #1e293b;
-  --destructive: #ef4444;
+  --secondary: #43a047;
+  --secondary-foreground: #ffffff;
+  --ring: #2e7d32;
+
+  /* Blue (secondary) */
+  --accent: #1565c0;
+  --accent-foreground: #ffffff;
+
+  /* Burgundy (accent/minor) */
+  --destructive: #880e4f;
   --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
+
+  /* Semantic */
+  --nav: #1b5e20;
+  --nav-foreground: #e8f5e9;
+  --hero: #388e3c;
+  --hero-foreground: #1b5e20;
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #0f0f0f;
-  --card-foreground: #ededed;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f1f5f9;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #334155;
-  --ring: #3b82f6;
+  /* Black / Neutral (dominant) */
+  --background: #121212;
+  --foreground: #e0e0e0;
+  --card: #1e1e1e;
+  --card-foreground: #e0e0e0;
+  --muted: #2c2c2c;
+  --muted-foreground: #9e9e9e;
+  --border: #424242;
+  --input: #2c2c2c;
+
+  /* Green (primary) */
+  --primary: #66bb6a;
+  --primary-foreground: #121212;
+  --secondary: #4caf50;
+  --secondary-foreground: #121212;
+  --ring: #66bb6a;
+
+  /* Blue (secondary) */
+  --accent: #42a5f5;
+  --accent-foreground: #121212;
+
+  /* Burgundy (accent/minor) */
+  --destructive: #f06292;
+  --destructive-foreground: #121212;
+
+  /* Semantic */
+  --nav: #1e1e1e;
+  --nav-foreground: #9e9e9e;
+  --hero: #424242;
+  --hero-foreground: #9e9e9e;
 }
 
 @theme inline {
+  --font-retro: "Press Start 2P", system-ui;
+  --font-body: "JetBrains Mono", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -61,15 +98,79 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-nav: var(--nav);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-hero: var(--hero);
+  --color-hero-foreground: var(--hero-foreground);
   --radius-sm: calc(var(--radius) - 0.125rem);
   --radius-md: calc(var(--radius));
   --radius-lg: calc(var(--radius) + 0.25rem);
 }
 
+* {
+  transition: all 150ms;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), monospace;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-retro), system-ui;
+  line-height: 1.4;
+}
+
+.glitch {
+  position: relative;
+  text-shadow: 0.05em 0 0 #00aaa7, -0.03em -0.04em 0 #9b009e,
+    0.025em 0.04em 0 #fffc00;
+  animation: glitch 500ms infinite;
+}
+
+.glitch span {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.glitch span:first-child {
+  animation: glitch 500ms infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+  transform: translate(-0.04em, -0.03em);
+  opacity: 0.75;
+}
+
+.glitch span:last-child {
+  animation: glitch 375ms infinite;
+  clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+  transform: translate(0.04em, 0.03em);
+  opacity: 0.75;
+}
+
+@keyframes glitch {
+  0% {
+    text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
+  }
+  15% {
+    text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
+  }
+  16% {
+    text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00;
+  }
+  49% {
+    text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00;
+  }
+  50% {
+    text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00;
+  }
+  99% {
+    text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00;
+  }
+  100% {
+    text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00;
+  }
 }
