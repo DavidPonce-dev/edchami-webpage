@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <HeroSection
-        name="Eduardo Chami"
+        name="Hola mi amorcito <3"
         titles={["Desarrollador Full Stack", "Desarrollador IoT"]}
         interests={["Hardware", "Robótica"]}
         imageUrl="https://i.ytimg.com/vi/q5tjvJz87rw/maxresdefault.jpg"
