@@ -5,10 +5,33 @@ import { Footer } from "@/components/Footer";
 import { OnUrlChange } from "@/hooks/useAuth";
 import { getUser } from "@/lib/auth";
 
+import { getBaseUrl } from "@/lib/getBaseUrl";
+
 export const metadata: Metadata = {
   title: "EdChami",
   description:
     "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
+  openGraph: {
+    title: "EdChami",
+    description:
+      "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
+    type: "website",
+    images: [
+      {
+        url: `${getBaseUrl()}/api/og`,
+        width: 1200,
+        height: 630,
+        alt: "EdChami - Developer, Builder, Problem Solver",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EdChami",
+    description:
+      "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
+    images: [`${getBaseUrl()}/api/og`],
+  },
 };
 
 interface RootLayoutProps {
