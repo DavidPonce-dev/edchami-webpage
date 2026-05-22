@@ -17,13 +17,25 @@ function parseDatabaseUrl(url: string) {
 const dbUrl = process.env.DATABASE_URL;
 const parsed = dbUrl ? parseDatabaseUrl(dbUrl) : null;
 
+const config = parsed
+  ? {
+      host: parsed.host,
+      port: parsed.port,
+      username: parsed.username,
+      password: parsed.password,
+      database: parsed.database,
+    }
+  : {
+      host: process.env.DB_HOST || process.env.POSTGRES_HOST || "localhost",
+      port: parseInt(process.env.DB_PORT || process.env.POSTGRES_PORT || "5432"),
+      username: process.env.DB_USER || process.env.POSTGRES_USER || "postgres",
+      password: process.env.DB_PASSWORD || process.env.POSTGRES_PASSWORD || "postgres",
+      database: process.env.DB_NAME || process.env.POSTGRES_DB || "edchami_dev",
+    };
+
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: parsed?.host || process.env.DB_HOST || "localhost",
-  port: parsed?.port || parseInt(process.env.DB_PORT || "5432"),
-  username: parsed?.username || process.env.DB_USER || "postgres",
-  password: parsed?.password || process.env.DB_PASSWORD || "postgres",
-  database: parsed?.database || process.env.DB_NAME || "edchami_dev",
+  ...config,
   synchronize: process.env.NODE_ENV !== "production",
   logging: process.env.NODE_ENV === "development",
   entities: [Project],
