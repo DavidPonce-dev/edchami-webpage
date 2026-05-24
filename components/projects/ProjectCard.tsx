@@ -1,7 +1,7 @@
 import { Project } from "@/types/project";
 
 export default function ProjectCard({ project }: { project: Project }) {
-  const { name, link, image, description, status } = project;
+  const { title, url, imageUrl, description, tags, status } = project;
   const isFinished = status === "finished";
 
   const statusLabels: Record<string, string> = {
@@ -14,11 +14,11 @@ export default function ProjectCard({ project }: { project: Project }) {
 
   return (
     <div
-      style={{ backgroundImage: `url(${image})` }}
+      style={{ backgroundImage: `url(${imageUrl || "/img/projects/default.jpg"})` }}
       className="h-52 relative group overflow-hidden bg-cover hover:opacity-90 bg-card dark:bg-card text-center border-solid border-2 border-border dark:border-border bg-center"
     >
       <p className="text-xl text-foreground relative z-10 bg-muted rounded-xl mt-2 w-fit mx-auto px-2 opacity-80">
-        {name}
+        {title}
       </p>
       {!isFinished && (
         <div
@@ -47,12 +47,25 @@ export default function ProjectCard({ project }: { project: Project }) {
         } p-2 px-3 text-justify bg-card text-foreground shadow-md`}
       >
         <p className="text-xs mb-3">{description}</p>
-        <a
-          href={link}
-          className="text-white bg-primary hover:bg-secondary hover:text-foreground rounded-lg text-xs px-3 py-2 dark:bg-primary dark:hover:text-primary-foreground dark:hover:bg-secondary"
-        >
-          Ver Proyecto
-        </a>
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {tags.map((tag, index) => (
+              <span key={index} className="text-xs bg-primary/20 px-2 py-1 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+        {url && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white bg-primary hover:bg-secondary hover:text-foreground rounded-lg text-xs px-3 py-2 dark:bg-primary dark:hover:text-primary-foreground dark:hover:bg-secondary"
+          >
+            Ver Proyecto
+          </a>
+        )}
       </div>
     </div>
   );

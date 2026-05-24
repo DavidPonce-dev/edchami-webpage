@@ -21,6 +21,9 @@ export class Project {
   @Column({ type: "jsonb", default: "[]" })
   tags!: string[];
 
+  @Column({ type: "varchar", length: 20, default: "pending" })
+  status!: 'pending' | 'onDevelopment' | 'finished';
+
   @CreateDateColumn()
   createdAt!: Date;
 

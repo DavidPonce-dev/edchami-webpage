@@ -1,3 +1,17 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contacto — Eduardo Chami",
+  description:
+    "Contacta a Eduardo Chami, desarrollador Full Stack en Chile. Disponible para proyectos web, IoT y consultoría de software.",
+  keywords: [
+    "contacto desarrollador Chile",
+    "freelancer desarrollo web Chile",
+    "desarrollador Full Stack contacto",
+    "Eduardo Chami contacto",
+  ],
+};
+
 export default function ContactPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

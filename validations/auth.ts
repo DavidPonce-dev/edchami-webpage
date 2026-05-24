@@ -2,6 +2,11 @@ import { z } from "zod";
 
 export const SigninFormSchema = z.object({
   email: z.email("Please enter a valid email address"),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be less than 30 characters")
+    .optional(),
   remember: z.boolean(),
   password: z
     .string()
@@ -11,6 +16,10 @@ export const SigninFormSchema = z.object({
 
 export const SignupFormSchema = z.object({
   email: z.email("Please enter a valid email address"),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be less than 30 characters"),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -25,10 +34,12 @@ export type FormState = {
   message?: string;
   data?: {
     email?: string;
+    username?: string;
     password?: string;
   };
   zodErrors?: {
     email?: string[];
+    username?: string[];
     password?: string[];
   } | null;
 };

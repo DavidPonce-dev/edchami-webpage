@@ -136,7 +136,7 @@ export function Navbar({ user }: NavbarProps) {
                       </svg>
                       Dashboard
                     </Link>
-                    {user.isAdmin && (
+                    {user.role === "admin" && (
                       <Link
                         href="/admin"
                         onClick={() => setShowUserMenu(false)}

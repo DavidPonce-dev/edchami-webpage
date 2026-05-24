@@ -1,7 +1,9 @@
 export interface User {
   id: number;
   email: string;
-  isAdmin?: boolean;
+  username: string;
+  role?: 'reader' | 'editor'| 'admin';
+  profilePicture?: string;
 }
 
 export interface UserResponse extends User {
@@ -11,6 +13,7 @@ export interface UserResponse extends User {
 export interface UserRegisterReq {
   email: string;
   password: string;
+  username: string;
 }
 
 export interface UserRegisterRes {
@@ -19,7 +22,9 @@ export interface UserRegisterRes {
   user: User | null;
 }
 
-export interface UserLoginReq extends UserRegisterReq {
+export interface UserLoginReq {
+  email: string;
+  password: string;
   remember: boolean;
 }
 

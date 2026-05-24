@@ -4,33 +4,83 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { OnUrlChange } from "@/hooks/useAuth";
 import { getUser } from "@/lib/auth";
+import { PersonSchema } from "@/components/seo/PersonSchema";
 
 import { getBaseUrl } from "@/lib/getBaseUrl";
 
 export const metadata: Metadata = {
-  title: "EdChami",
+  title: {
+    default: "Eduardo Chami — Desarrollador Full Stack & IoT | EdChami",
+    template: "%s | EdChami",
+  },
   description:
-    "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
+    "Portafolio de Eduardo Chami — Desarrollador Full Stack especializado en aplicaciones web escalables, IoT, hardware y robótica.",
+  keywords: [
+    "Eduardo Chami",
+    "EdChami",
+    "Desarrollador Full Stack",
+    "Desarrollador Full Stack Chile",
+    "Desarrollador Chile",
+    "Programador Chile",
+    "Desarrollador Web Chile",
+    "Desarrollador Santiago",
+    "Desarrollador IoT",
+    "Desarrollo Web",
+    "Desarrollo de Software Chile",
+    "Ingeniero de Software Chile",
+    "Programador Full Stack",
+    "Desarrollador Frontend Chile",
+    "Desarrollador Backend Chile",
+    "Hardware",
+    "Robótica",
+    "Portfolio",
+    "Portafolio",
+    "Freelancer Chile",
+    "Desarrollador Web Freelance",
+  ],
+  authors: [{ name: "Eduardo Chami", url: getBaseUrl() }],
+  creator: "Eduardo Chami",
+  publisher: "Eduardo Chami",
+  metadataBase: new URL(getBaseUrl()),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "EdChami",
-    description:
-      "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
     type: "website",
+    locale: "es_CL",
+    siteName: "EdChami",
+    title: "Eduardo Chami — Desarrollador Full Stack & IoT",
+    description:
+      "Portafolio de Eduardo Chami — Desarrollador Full Stack especializado en aplicaciones web escalables, IoT, hardware y robótica.",
     images: [
       {
-        url: `${getBaseUrl()}/api/og`,
+        url: "/api/og",
         width: 1200,
         height: 630,
-        alt: "EdChami - Developer, Builder, Problem Solver",
+        alt: "EdChami - Eduardo Chami, Desarrollador Full Stack & IoT",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EdChami",
+    title: "Eduardo Chami — Desarrollador Full Stack & IoT",
     description:
-      "Personal portfolio of Eduardo Chami — developer, builder, and problem solver.",
-    images: [`${getBaseUrl()}/api/og`],
+      "Portafolio de Eduardo Chami — Desarrollador Full Stack especializado en aplicaciones web escalables, IoT, hardware y robótica.",
+    images: ["/api/og"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
   },
 };
 
@@ -42,7 +92,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const user = await getUser();
 
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="es" className="h-full antialiased" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -68,6 +118,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <PersonSchema />
         <OnUrlChange user={user} />
         <Navbar user={user} />
         <div className="mb-auto">

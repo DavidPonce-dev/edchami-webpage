@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const { id, email, isAdmin } = user;
-  const newToken = signToken({ id, email, isAdmin });
+  const { id, email, role } = user;
+  const newToken = signToken({ id, email, role });
 
   if (!newToken) {
     const response = NextResponse.json(
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   response.cookies.set("auth_token", newToken, accessTokenCookieOptions);
 
   if (refreshToken) {
-    const newRefreshToken = signRefreshToken({ id, email, isAdmin });
+    const newRefreshToken = signRefreshToken({ id, email, role });
     response.cookies.set(
       "refresh_token",
       newRefreshToken,

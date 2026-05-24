@@ -1,8 +1,21 @@
-import { useProjects } from "@/data/projects";
+import { getProjects } from "@/actions/projects";
 import ProjectCard from "@/components/projects/ProjectCard";
+import type { Metadata } from "next";
 
-export default function ProjectsPage() {
-  const { projects } = useProjects();
+export const metadata: Metadata = {
+  title: "Proyectos — Portafolio de Eduardo Chami",
+  description:
+    "Proyectos de desarrollo web, IoT y hardware de Eduardo Chami. Desarrollador Full Stack en Chile.",
+  keywords: [
+    "proyectos desarrollo web Chile",
+    "portafolio desarrollador Chile",
+    "proyectos IoT Chile",
+    "Eduardo Chami proyectos",
+  ],
+};
+
+export default async function ProjectsPage() {
+  const projects = await getProjects();
 
   return (
     <div className="px-4">
@@ -13,7 +26,7 @@ export default function ProjectsPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-gray-400">
         {projects.slice(0, 3).map((project) => (
-          <ProjectCard key={project.name} project={project} />
+          <ProjectCard key={project.id} project={project} />
         ))}
       </div>
     </div>

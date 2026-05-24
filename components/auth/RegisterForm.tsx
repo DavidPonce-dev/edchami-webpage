@@ -14,12 +14,14 @@ import { PasswordStrengthMeter } from '@/components/ui/PasswordStrengthMeter';
 
 interface FieldErrors {
   email?: string;
+  username?: string;
   password?: string;
   confirmPassword?: string;
 }
 
 const registerSchema = z.object({
   email: z.email('Correo electrónico no válido'),
+  username: z.string().min(3, 'El usuario debe tener al menos 3 caracteres'),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   confirmPassword: z.string().min(1, 'Por favor confirme su contraseña'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -43,6 +45,7 @@ function SubmitButton() {
 
 export function RegisterForm() {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -59,6 +62,7 @@ export function RegisterForm() {
     const formData = new FormData(e.currentTarget);
     const data = {
       email: formData.get('email'),
+      username: formData.get('username'),
       password: formData.get('password'),
       confirmPassword: formData.get('confirmPassword'),
     };
@@ -91,6 +95,20 @@ export function RegisterForm() {
         </h2>
         
         <form action={formAction} onSubmit={handleSubmit} className="space-y-6">
+          <FormField
+            label="Usuario"
+            id="username"
+            name="username"
+            type="text"
+            placeholder="tu_usuario"
+            required
+            autoComplete="username"
+            icon={<MailIcon className="w-5 h-5" />}
+            value={username}
+            onChange={(e) => { setUsername(e.target.value); handleFieldChange('username'); }}
+            error={fieldErrors.username}
+          />
+          
           <FormField
             label="Email"
             id="email"

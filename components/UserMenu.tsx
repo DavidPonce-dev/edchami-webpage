@@ -45,7 +45,7 @@ export function UserMenu({ user }: UserMenuProps) {
                   </p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
-                {user.isAdmin && (
+                {user.role === "admin" && (
                   <Link
                     href="/admin"
                     className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"

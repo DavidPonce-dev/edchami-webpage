@@ -25,7 +25,7 @@ export default async function DashboardPage() {
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Role</dt>
               <dd className="text-foreground">
-                {user?.isAdmin ? (
+                {user?.role === "admin" ? (
                   <span className="text-destructive font-medium">Admin</span>
                 ) : (
                   <span className="text-muted-foreground">User</span>

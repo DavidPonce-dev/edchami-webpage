@@ -12,6 +12,7 @@ export async function registerAction(
   const fields = {
     password: formData?.get("password") as string,
     email: formData?.get("email") as string,
+    username: formData?.get("username") as string,
   };
 
   const validatedFields = SignupFormSchema.safeParse(fields);
