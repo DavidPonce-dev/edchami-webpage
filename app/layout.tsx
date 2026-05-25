@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { OnUrlChange } from "@/hooks/useAuth";
+import { AuthProvider } from "@/hooks/useAuth";
 import { getUser } from "@/lib/auth";
 import { PersonSchema } from "@/components/seo/PersonSchema";
 
@@ -119,14 +119,15 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className="min-h-full flex flex-col">
         <PersonSchema />
-        <OnUrlChange user={user} />
-        <Navbar user={user} />
-        <div className="mb-auto">
-          <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
-            {children}
+        <AuthProvider initialUser={user}>
+          <Navbar />
+          <div className="mb-auto">
+            <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
+              {children}
+            </div>
           </div>
-        </div>
-        <Footer />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

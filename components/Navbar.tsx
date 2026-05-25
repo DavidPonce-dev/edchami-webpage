@@ -3,13 +3,8 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User } from "@/types/user";
-import { logout } from "@/lib/auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "./Logo";
-
-interface NavbarProps {
-  user: User | null;
-}
 
 function subscribe(callback: () => void) {
   const observer = new MutationObserver(callback);
@@ -30,11 +25,12 @@ const navLinks = [
   { name: "Contacto", href: "/contact" },
 ];
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const darkMode = useSyncExternalStore(subscribe, getSnapshot, () => false);
+  const { user, logout } = useAuth();
 
   const toggleDarkMode = () => {
     const isDark = document.documentElement.classList.toggle("dark");
@@ -44,7 +40,6 @@ export function Navbar({ user }: NavbarProps) {
   const handleLogout = async () => {
     await logout();
     setShowUserMenu(false);
-    window.location.href = "/login";
   };
 
   const isActive = (href: string) => pathname === href;
@@ -53,7 +48,6 @@ export function Navbar({ user }: NavbarProps) {
     <>
       <div className="w-full h-13" />
       <nav className="fixed h-13 top-0 left-0 z-50 w-full bg-nav dark:bg-nav-surface shadow-lg shadow-slate-600/50 dark:shadow-black/50">
-        {/* Accent gradient line (blue → burgundy, light mode only) */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-nav-accent-blue via-purple-600 to-nav-accent-burgundy opacity-60 dark:opacity-0" />
         <div className="max-w-screen-xl px-4 py-2 flex flex-col md:flex-row items-center justify-between mx-auto">
           <div className="flex justify-between w-full">

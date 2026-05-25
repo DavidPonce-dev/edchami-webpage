@@ -1,27 +1,89 @@
 "use client";
 
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { User } from "@/types/user";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { logout as logoutAction } from "@/lib/auth";
 
-export function OnUrlChange({ user }: { user: User | null }) {
+interface AuthContextValue {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return ctx;
+}
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+  initialUser: User | null;
+}
+
+export function AuthProvider({ children, initialUser }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(initialUser);
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const refreshingRef = useRef(false);
+
+  const refreshSession = useCallback(async () => {
+    if (refreshingRef.current || !user) return;
+    refreshingRef.current = true;
+
+    try {
+      const res = await fetch("/api/auth/refresh", { method: "POST" });
+      if (res.status === 401) {
+        setUser(null);
+        router.push("/login");
+      }
+    } catch (err) {
+      console.error("Failed to refresh session", err);
+    } finally {
+      refreshingRef.current = false;
+    }
+  }, [user, router]);
 
   useEffect(() => {
-    if (!user || loading) return;
+    if (!user || refreshingRef.current) return;
 
-    setLoading(true);
+    refreshingRef.current = true;
 
     fetch("/api/auth/refresh", { method: "POST" })
       .then((res) => {
-        if (res.status === 401) router.push("/login");
+        if (res.status === 401) {
+          setUser(null);
+          router.push("/login");
+        }
       })
-      .catch((err) => console.error("Failed to refresh user", err))
-      .finally(() => setLoading(false));
-  }, [pathname, searchParams.toString(), user, router]);
+      .catch((err) => console.error("Failed to refresh session", err))
+      .finally(() => {
+        refreshingRef.current = false;
+      });
+  }, [pathname, user, router]);
 
-  return <></>;
+  const logout = useCallback(async () => {
+    await logoutAction();
+    setUser(null);
+    router.push("/login");
+  }, [router]);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, logout, refreshSession }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

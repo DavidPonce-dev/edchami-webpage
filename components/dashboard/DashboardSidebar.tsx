@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { User } from "@/types/user";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import {
   HomeIcon,
   FolderIcon,
@@ -12,11 +12,6 @@ import {
   ShieldIcon,
   LogOutIcon,
 } from "@/components/Icons";
-import { logout } from "@/lib/auth";
-
-interface DashboardSidebarProps {
-  user: User | null;
-}
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: HomeIcon },
@@ -29,14 +24,9 @@ const adminItems = [
   { name: "Admin Panel", href: "/dashboard/admin", icon: ShieldIcon },
 ];
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+export function DashboardSidebar() {
+  const { user, logout } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -97,7 +87,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
         <div className="p-3 border-t border-border">
           <button
-            onClick={handleLogout}
+            onClick={logout}
             className="flex items-center gap-3 w-full px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
           >
             <LogOutIcon className="w-5 h-5" />
@@ -106,20 +96,15 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         </div>
       </aside>
 
-      <MobileSidebar user={user} />
+      <MobileSidebar />
     </>
   );
 }
 
-function MobileSidebar({ user }: { user: User | null }) {
+function MobileSidebar() {
+  const { user, logout } = useAuth();
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -216,7 +201,7 @@ function MobileSidebar({ user }: { user: User | null }) {
               <button
                 onClick={() => {
                   setIsOpen(false);
-                  handleLogout();
+                  logout();
                 }}
                 className="flex items-center gap-3 w-full px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground rounded-md transition-colors"
               >

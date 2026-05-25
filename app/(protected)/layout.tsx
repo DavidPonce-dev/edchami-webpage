@@ -12,7 +12,7 @@ export default async function ProtectedLayout({ children }: LayoutProps) {
 
   return (
     <div className="flex min-h-[calc(100vh-3.25rem)]">
-      <DashboardSidebar user={user} />
+      <DashboardSidebar />
       <main className="flex-1 overflow-auto">
         {children}
       </main>
