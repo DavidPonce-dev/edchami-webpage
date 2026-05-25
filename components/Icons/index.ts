@@ -16,3 +16,5 @@ export { HomeIcon } from './HomeIcon';
 export { ChevronDownIcon } from './ChevronDownIcon';
 export { GoogleIcon } from './GoogleIcon';
 export { GitHubIcon } from './GitHubIcon';
+export { FolderIcon } from './FolderIcon';
+export { LogOutIcon } from './LogOutIcon';
