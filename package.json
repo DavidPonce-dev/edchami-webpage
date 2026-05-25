@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run -d typeorm.config.ts",
+    "db:migrate:revert": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:revert -d typeorm.config.ts",
+    "db:migrate:generate": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate -d typeorm.config.ts",
+    "db:migrate:create": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:create",
+    "db:sync": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js schema:sync -d typeorm.config.ts",
+    "db:drop": "ts-node --project tsconfig.json -r tsconfig-paths/register node_modules/typeorm/cli.js schema:drop -d typeorm.config.ts"
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.3",
@@ -28,6 +34,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

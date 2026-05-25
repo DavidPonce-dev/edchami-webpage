@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Project } from "@/entities/Project";
-import { User } from "@/entities/User";
+import { Project } from "./entities/Project";
+import { User } from "./entities/User";
 
 function parseDatabaseUrl(url: string) {
   const match = url.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
@@ -37,18 +37,8 @@ const config = parsed
 export const AppDataSource = new DataSource({
   type: "postgres",
   ...config,
-  synchronize: process.env.NODE_ENV !== "production",
-  logging: process.env.NODE_ENV === "development",
+  synchronize: false,
+  logging: true,
   entities: [Project, User],
   migrations: ["migrations/**/*.ts"],
 });
-
-let initialized = false;
-
-export async function getDB(): Promise<DataSource> {
-  if (!initialized) {
-    await AppDataSource.initialize();
-    initialized = true;
-  }
-  return AppDataSource;
-}
