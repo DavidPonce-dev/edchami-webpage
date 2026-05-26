@@ -12,6 +12,13 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
 ];
 
+const cacheHeaders = [
+  {
+    key: "Cache-Control",
+    value: "public, max-age=31536000, immutable",
+  },
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["typeorm", "pg", "reflect-metadata"],
@@ -29,6 +36,18 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: cacheHeaders,
+      },
+      {
+        source: "/static/:path*",
+        headers: cacheHeaders,
+      },
+      {
+        source: "/img/:path*",
+        headers: cacheHeaders,
       },
     ];
   },
