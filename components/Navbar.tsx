@@ -51,9 +51,7 @@ export function Navbar() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-nav-accent-blue via-purple-600 to-nav-accent-burgundy opacity-60 dark:opacity-0" />
         <div className="max-w-screen-xl px-4 py-2 flex flex-col md:flex-row items-center justify-between mx-auto">
           <div className="flex justify-between w-full">
-            {/* Logo */}
             <Logo className="me-auto" />
-            {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
               className="w-8 h-8 me-3 mt-1 flex items-center justify-center rounded-full bg-nav-toggle dark:bg-nav-toggle hover:opacity-80 text-nav-toggle-foreground dark:text-nav-toggle-foreground transition-opacity"
@@ -94,9 +92,7 @@ export function Navbar() {
               )}
             </button>
 
-            {/* User section
-            
-                        {user ? (
+            {user ? (
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -132,7 +128,7 @@ export function Navbar() {
                     </Link>
                     {user.role === "admin" && (
                       <Link
-                        href="/admin"
+                        href="/dashboard/admin"
                         onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
@@ -172,10 +168,7 @@ export function Navbar() {
                 </Link>
               </div>
             )}
-            
-            */}
 
-            {/* Mobile hamburger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex p-2 w-10 h-10 justify-center text-sm text-nav-text rounded-lg md:hidden hover:bg-nav-surface-hover focus:outline-none focus:ring-2 focus:ring-nav-ring"
@@ -200,7 +193,6 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Nav links - Desktop */}
           <div
             className={`w-full md:block md:w-auto ${isOpen ? "block" : "hidden"}`}
             id="navbar"
@@ -221,31 +213,6 @@ export function Navbar() {
                   </Link>
                 </li>
               ))}
-
-              {/* Mobile-only auth links 
-              {!user && (
-                <li className="sm:hidden border-t border-nav-border dark:border-gray-700/50 pt-2 mt-2">
-                  <Link
-                    onClick={() => setIsOpen(false)}
-                    href="/login"
-                    className="block py-2 px-3 text-center text-nav-text hover:bg-nav-surface-hover rounded font-retro text-xs"
-                  >
-                    Login
-                  </Link>
-                </li>
-              )}
-              {!user && (
-                <li className="sm:hidden">
-                  <Link
-                    onClick={() => setIsOpen(false)}
-                    href="/register"
-                    className="block py-2 px-3 text-center bg-nav-text/20 text-nav-text-active rounded font-retro text-xs"
-                  >
-                    Register
-                  </Link>
-                </li>
-              )}
-              */}
             </ul>
           </div>
         </div>

@@ -21,7 +21,6 @@ export async function middleware(request: NextRequest) {
     try {
       const baseUrl = request.nextUrl.origin;
       const response = await fetch(`${baseUrl}/api/setup-status`, {
-        cache: "no-store",
         headers: { cookie: request.headers.get("cookie") || "" },
       });
 

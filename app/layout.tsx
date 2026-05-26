@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { AuthProvider } from "@/hooks/useAuth";
-import { getUser } from "@/lib/auth";
 import { PersonSchema } from "@/components/seo/PersonSchema";
 
 import { getBaseUrl } from "@/lib/getBaseUrl";
@@ -88,9 +86,7 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const user = await getUser();
-
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" className="h-full antialiased" suppressHydrationWarning>
       <head>
@@ -119,15 +115,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       </head>
       <body className="min-h-full flex flex-col">
         <PersonSchema />
-        <AuthProvider initialUser={user}>
-          <Navbar />
-          <div className="mb-auto">
-            <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
-              {children}
-            </div>
+        <Navbar />
+        <div className="mb-auto">
+          <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
+            {children}
           </div>
-          <Footer />
-        </AuthProvider>
+        </div>
+        <Footer />
       </body>
     </html>
   );

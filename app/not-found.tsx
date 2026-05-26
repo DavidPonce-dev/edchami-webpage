@@ -1,23 +1,14 @@
-"use client";
-
-import { useSyncExternalStore } from "react";
+import { headers } from "next/headers";
 import Link from "next/link";
 
-function subscribe(callback: () => void) {
-  const observer = new MutationObserver(callback);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}
+export default async function NotFound() {
+  const cookieHeader = (await headers()).get("cookie") || "";
+  const themeMatch = cookieHeader.match(/theme=(dark|light)/);
+  const isDark = themeMatch
+    ? themeMatch[1] === "dark"
+    : true;
 
-function getSnapshot() {
-  return document.documentElement.classList.contains("dark");
-}
-
-export default function NotFound() {
-  const darkMode = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const currentUrl = typeof window !== "undefined" ? window.location.pathname : "";
-
-  const bgImage = darkMode
+  const bgImage = isDark
     ? "/img/notFound/dark-bg.jpg"
     : "/img/notFound/light-bg.jpg";
 
@@ -33,9 +24,6 @@ export default function NotFound() {
         <h1 className="mt-4 text-xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
           Página no encontrada
         </h1>
-        <p className="mt-6 text-base leading-7 text-gray-600 sm:text-lg lg:text-xl">
-          La URL {currentUrl} no existe
-        </p>
         <p className="mt-6 text-base leading-7 text-gray-600 sm:text-lg lg:text-xl">
           No pudimos encontrar lo que busca.
         </p>
