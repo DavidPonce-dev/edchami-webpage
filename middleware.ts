@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
       const baseUrl = request.nextUrl.origin;
       const response = await fetch(`${baseUrl}/api/setup-status`, {
         headers: { cookie: request.headers.get("cookie") || "" },
+        cache: "force-cache",
       });
 
       if (response.ok) {

@@ -5,29 +5,11 @@ import Link from 'next/link';
 import { useFormStatus } from 'react-dom';
 import { useActionState } from 'react';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { registerAction } from '@/actions/auth';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { FormField} from '@/components/ui/FormField';
 import { MailIcon } from '@/components/Icons';
 import { PasswordStrengthMeter } from '@/components/ui/PasswordStrengthMeter';
-
-interface FieldErrors {
-  email?: string;
-  username?: string;
-  password?: string;
-  confirmPassword?: string;
-}
-
-const registerSchema = z.object({
-  email: z.email('Correo electrónico no válido'),
-  username: z.string().min(3, 'El usuario debe tener al menos 3 caracteres'),
-  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
-  confirmPassword: z.string().min(1, 'Por favor confirme su contraseña'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword'],
-});
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -48,7 +30,6 @@ export function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   
   const [state, formAction] = useActionState(registerAction, null);
 
@@ -58,34 +39,7 @@ export function RegisterForm() {
     }
   }, [state]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      email: formData.get('email'),
-      username: formData.get('username'),
-      password: formData.get('password'),
-      confirmPassword: formData.get('confirmPassword'),
-    };
-
-    const result = registerSchema.safeParse(data);
-    if (!result.success) {
-      e.preventDefault();
-      const errors: FieldErrors = {};
-      result.error.issues.forEach((issue) => {
-        const field = issue.path[0] as keyof FieldErrors;
-        if (field && !errors[field]) {
-          errors[field] = issue.message;
-        }
-      });
-      setFieldErrors(errors);
-    } else {
-      setFieldErrors({});
-    }
-  }
-
-  function handleFieldChange(field: keyof FieldErrors) {
-    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
-  }
+  const serverErrors = state?.zodErrors;
 
   return (
     <div className="flex items-center justify-center p-4">
@@ -94,7 +48,7 @@ export function RegisterForm() {
           Crear cuenta
         </h2>
         
-        <form action={formAction} onSubmit={handleSubmit} className="space-y-6">
+        <form action={formAction} className="space-y-6">
           <FormField
             label="Usuario"
             id="username"
@@ -105,8 +59,8 @@ export function RegisterForm() {
             autoComplete="username"
             icon={<MailIcon className="w-5 h-5" />}
             value={username}
-            onChange={(e) => { setUsername(e.target.value); handleFieldChange('username'); }}
-            error={fieldErrors.username}
+            onChange={(e) => setUsername(e.target.value)}
+            error={serverErrors?.username?.[0]}
           />
           
           <FormField
@@ -119,8 +73,8 @@ export function RegisterForm() {
             autoComplete="email"
             icon={<MailIcon className="w-5 h-5" />}
             value={email}
-            onChange={(e) => { setEmail(e.target.value); handleFieldChange('email'); }}
-            error={fieldErrors.email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={serverErrors?.email?.[0]}
           />
           
           <div className="space-y-1.5">
@@ -135,8 +89,8 @@ export function RegisterForm() {
               autoComplete="new-password"
               minLength={8}
               value={password}
-              onChange={(e) => { setPassword(e.target.value); handleFieldChange('password'); }}
-              error={fieldErrors.password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={serverErrors?.password?.[0]}
             />
             <p className="text-xs text-muted-foreground">Mínimo 8 caracteres</p>
             <PasswordStrengthMeter password={password} />
@@ -153,8 +107,8 @@ export function RegisterForm() {
               required
               autoComplete="new-password"
               value={confirmPassword}
-              onChange={(e) => { setConfirmPassword(e.target.value); handleFieldChange('confirmPassword'); }}
-              error={fieldErrors.confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={serverErrors?.confirmPassword?.[0]}
             />
           </div>
 

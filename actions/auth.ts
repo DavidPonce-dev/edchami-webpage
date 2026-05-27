@@ -9,8 +9,10 @@ export async function registerAction(
   prevState: FormState | null,
   formData: FormData,
 ): Promise<FormState | null> {
+  const password = formData?.get("password") as string;
+  const confirmPassword = formData?.get("confirmPassword") as string;
   const fields = {
-    password: formData?.get("password") as string,
+    password,
     email: formData?.get("email") as string,
     username: formData?.get("username") as string,
   };
@@ -24,6 +26,15 @@ export async function registerAction(
       success: false,
       message: "Validation error",
       zodErrors: flattenedErrors.fieldErrors,
+      data: fields,
+    };
+  }
+
+  if (password !== confirmPassword) {
+    return {
+      success: false,
+      message: "Validation error",
+      zodErrors: { confirmPassword: ["Las contraseñas no coinciden"] },
       data: fields,
     };
   }
