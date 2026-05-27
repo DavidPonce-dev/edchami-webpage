@@ -9,7 +9,24 @@ services:
       - .env
     environment:
       - DB_HOST=${DB_HOST:-db}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: ["sh", "scripts/migrate.sh"]
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${DB_HOST:-db}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
 
   db:
     image: postgres:17-alpine
