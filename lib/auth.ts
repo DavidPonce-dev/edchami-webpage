@@ -68,17 +68,6 @@ export async function registerService({
       isActive: true,
     }).returning();
 
-    if (isFirstUser) {
-      const cookieStore = await cookies();
-      cookieStore.set("setup_complete", "true", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 365,
-      });
-    }
-
     return { error: null, message: "User registered successfully", user: toPublicUser(newUser) };
   } catch (error) {
     logger.error("Registration error:", error);
