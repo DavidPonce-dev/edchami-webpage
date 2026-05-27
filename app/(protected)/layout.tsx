@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
-import { AuthProvider } from "@/hooks/useAuth";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 
 export const dynamic = "force-dynamic";
@@ -14,13 +13,11 @@ export default async function ProtectedLayout({ children }: LayoutProps) {
   if (!user) redirect("/login");
 
   return (
-    <AuthProvider initialUser={user}>
-      <div className="flex min-h-[calc(100vh-3.25rem)]">
-        <DashboardSidebar />
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
-      </div>
-    </AuthProvider>
+    <div className="flex min-h-[calc(100vh-3.25rem)]">
+      <DashboardSidebar />
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
+    </div>
   );
 }

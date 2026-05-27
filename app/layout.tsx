@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PersonSchema } from "@/components/seo/PersonSchema";
+import { AuthProvider } from "@/hooks/useAuth";
 
 import { getBaseUrl } from "@/lib/getBaseUrl";
 
@@ -120,16 +121,18 @@ export default function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <PersonSchema />
-        <Navbar />
-        <div className="mb-auto">
-          <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
-            <main role="main">
-              {children}
-            </main>
+        <AuthProvider initialUser={null}>
+          <PersonSchema />
+          <Navbar />
+          <div className="mb-auto">
+            <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
+              <main role="main">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
-        <Footer />
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

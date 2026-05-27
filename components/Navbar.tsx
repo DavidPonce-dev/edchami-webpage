@@ -46,7 +46,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const darkMode = useSyncExternalStore(subscribe, getSnapshot, () => false);
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
 
   const toggleDarkMode = () => {
     const isDark = document.documentElement.classList.toggle("dark");
@@ -108,7 +108,12 @@ export function Navbar() {
               )}
             </button>
 
-            {user ? (
+            {isLoading ? (
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-14 h-7 bg-nav-text/20 rounded-md animate-pulse" />
+                <div className="w-16 h-7 bg-nav-text/20 rounded-md animate-pulse" />
+              </div>
+            ) : user ? (
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
