@@ -7,7 +7,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ name, titles, interests, imageUrl }: HeroSectionProps) {
   return (
-    <section className="min-h-96 rounded-md bg-primary text-primary-foreground/80 dark:bg-hero dark:text-hero-foreground">
+    <section className="min-h-96 rounded-md bg-primary text-primary-foreground dark:bg-hero dark:text-hero-foreground">
       <div className="grid md:grid-cols-2">
         <div className="p-5 md:p-10">
           <div className="block md:hidden">
@@ -21,7 +21,7 @@ export function HeroSection({ name, titles, interests, imageUrl }: HeroSectionPr
               loading="eager"
             />
           </div>
-          <div className="my-5 text-center text-opacity-80 md:text-left text-1xl md:text-2xl glitch">
+          <div className="my-5 text-center md:text-left text-1xl md:text-2xl glitch">
             <h1 className="text-3xl md:text-5xl font-bold">{name}</h1>
             {titles.map((title) => (
               <p key={title}>{title}</p>

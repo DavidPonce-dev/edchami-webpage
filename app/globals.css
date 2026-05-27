@@ -101,7 +101,7 @@
   --nav-toggle: rgba(147, 197, 253, 0.8);
   --nav-toggle-foreground: #111827;
   --hero: #424242;
-  --hero-foreground: #9e9e9e;
+  --hero-foreground: #e0e0e0;
 }
 
 @theme inline {
