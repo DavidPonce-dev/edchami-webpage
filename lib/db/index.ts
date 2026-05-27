@@ -16,14 +16,14 @@ const client = postgres(getDbUrl(), {
   max: 10,
   idle_timeout: 20,
   connect_timeout: 10,
-  debug: process.env.NODE_ENV !== "production" ? (
+  debug: (
     connection: number,
     query: string,
     params: unknown[],
     paramTypes: unknown[]
   ) => {
     console.log(`[SQL] ${query}`, params);
-  } : undefined,
+  },
 });
 
-export const db = drizzle(client, { schema, logger: process.env.NODE_ENV !== "production" });
+export const db = drizzle(client, { schema, logger: true });
