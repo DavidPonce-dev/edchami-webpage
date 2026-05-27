@@ -60,7 +60,7 @@ export function Footer() {
           <div className="w-16 h-px bg-gradient-to-r from-nav-accent-blue to-nav-accent-burgundy opacity-40 dark:opacity-30 dark:bg-gray-700" />
 
           {/* Logo */}
-          <Logo className="opacity-60 hover:opacity-100 transition-opacity" />
+          <Logo className="opacity-60 hover:opacity-100 transition-opacity" aria-label="Ir al inicio - EdChami" />
         </div>
       </div>
     </footer>

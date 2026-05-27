@@ -124,7 +124,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Navbar />
         <div className="mb-auto">
           <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
-            {children}
+            <main role="main">
+              {children}
+            </main>
           </div>
         </div>
         <Footer />

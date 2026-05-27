@@ -2,11 +2,12 @@ import Link from "next/link";
 
 interface LogoProps {
   className?: string;
+  "aria-label"?: string;
 }
 
-export function Logo({ className = "" }: LogoProps) {
+export function Logo({ className = "", "aria-label": ariaLabel }: LogoProps) {
   return (
-    <Link href="/" className={`flex items-center gap-2 ${className}`}>
+    <Link href="/" className={`flex items-center gap-2 ${className}`} aria-label={ariaLabel}>
       <svg
         width="36"
         height="36"

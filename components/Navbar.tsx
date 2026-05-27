@@ -113,6 +113,8 @@ export function Navbar() {
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-1 px-3 py-2 text-sm text-nav-text/90 hover:bg-nav-surface-hover dark:hover:bg-gray-800 rounded-md transition-colors"
+                  aria-label="Menú de usuario"
+                  aria-expanded={showUserMenu}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -190,6 +192,7 @@ export function Navbar() {
               className="inline-flex p-2 w-10 h-10 justify-center text-sm text-nav-text rounded-lg md:hidden hover:bg-nav-surface-hover focus:outline-none focus:ring-2 focus:ring-nav-ring"
               aria-controls="navbar"
               aria-expanded={isOpen}
+              aria-label="Abrir menú de navegación"
             >
               <svg
                 className="w-5 h-5"
