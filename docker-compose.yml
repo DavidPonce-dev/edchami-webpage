@@ -17,7 +17,7 @@ services:
   migrate:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.migrate
     command: ["sh", "scripts/migrate.sh"]
     env_file:
       - .env

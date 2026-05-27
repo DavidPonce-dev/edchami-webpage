@@ -8,6 +8,10 @@ export async function GET() {
     const count = await db.getRepository(User).count();
     return NextResponse.json({ hasUsers: count > 0 });
   } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("relation") && message.includes("does not exist")) {
+      return NextResponse.json({ hasUsers: false });
+    }
     console.error("Setup status check failed:", error);
     return NextResponse.json({ hasUsers: false });
   }

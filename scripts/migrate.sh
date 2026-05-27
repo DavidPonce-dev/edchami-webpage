@@ -9,7 +9,7 @@ RETRY_COUNT=0
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
   if pg_isready -h "${DB_HOST:-db}" -p "${DB_PORT:-5432}" -U "${DB_USER:-postgres}" 2>/dev/null; then
     echo "Database is ready. Running migrations..."
-    npx ts-node --project tsconfig.migrations.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run -d typeorm.config.ts
+    ./node_modules/.bin/ts-node --project tsconfig.migrations.json -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run -d typeorm.config.ts
     echo "Migrations completed successfully."
     exit 0
   fi
