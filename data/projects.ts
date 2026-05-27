@@ -1,4 +1,14 @@
-import { Project } from "../types/project";
+type Project = {
+  id: number;
+  title: string;
+  description: string;
+  url?: string;
+  imageUrl?: string;
+  tags: string[];
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 export const useProjects = () => {
   const projects: Project[] = [

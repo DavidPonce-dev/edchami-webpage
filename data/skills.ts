@@ -1,6 +1,7 @@
-import { Skill } from "../types/project";
-
-export type { Skill };
+export type Skill = {
+  name: string;
+  image: string;
+};
 
 export const frontendSkills: Skill[] = [
   {

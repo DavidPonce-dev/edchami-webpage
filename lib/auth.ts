@@ -1,105 +1,71 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { eq, asc } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { user as userTable } from "@/lib/db/schema";
 import { signToken, signRefreshToken, verifyToken } from "@/lib/jwt";
-import { getDB } from "@/lib/db";
-import { User } from "@/entities/User";
 import { hashPassword, verifyPassword, sanitizeString } from "@/lib/security";
-import {
-  UserLoginRes,
-  UserLoginReq,
-  UserRegisterReq,
-  UserRegisterRes,
-  User as UserType,
-} from "@/types/user";
 
-const authCookieOpts = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: 60 * 60 * 24,
+export type PublicUser = {
+  id: number;
+  email: string;
+  username: string;
+  role: string;
+  profilePicture?: string;
 };
 
-const refreshCookieOpts = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
-  path: "/",
-  maxAge: 60 * 60 * 24 * 15,
-};
-
-function toPublicUser(user: User): UserType {
+function toPublicUser(u: typeof userTable.$inferSelect): PublicUser {
   return {
-    id: user.id,
-    email: user.email,
-    username: user.username,
-    role: user.role,
-    profilePicture: user.profilePicture || undefined,
+    id: u.id,
+    email: u.email,
+    username: u.username,
+    role: u.role,
+    profilePicture: u.profilePicture || undefined,
   };
 }
 
-export async function hasAnyUsers(): Promise<boolean> {
-  try {
-    const db = await getDB();
-    const count = await db.getRepository(User).count();
-    return count > 0;
-  } catch {
-    return false;
-  }
-}
-
-export async function isAuthenticated(): Promise<boolean> {
+export async function getUser(): Promise<PublicUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
-  if (!token) return false;
-  if (!verifyToken(token)) return false;
-  return true;
-}
-
-export async function getUser(): Promise<UserType | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
-
   if (!token) return null;
-
-  const payload = verifyToken<UserType>(token);
-  return payload;
+  return verifyToken<PublicUser>(token);
 }
 
 export async function registerService({
   email,
   password,
   username,
-}: UserRegisterReq): Promise<UserRegisterRes> {
+}: { email: string; password: string; username: string }): Promise<{
+  error: string | null;
+  message: string | null;
+  user: PublicUser | null;
+}> {
   try {
-    const db = await getDB();
-    const existingUser = await db.getRepository(User).findOne({
-      where: [{ email }, { username }],
+    const existing = await db.query.user.findFirst({
+      where: eq(userTable.email, email.toLowerCase()),
     });
-
-    if (existingUser) {
-      return {
-        error: "Email or username already exists",
-        message: null,
-        user: null,
-      };
+    if (existing) {
+      return { error: "Email or username already exists", message: null, user: null };
     }
 
-    const passwordHash = hashPassword(password);
+    const existingUsername = await db.query.user.findFirst({
+      where: eq(userTable.username, username.toLowerCase()),
+    });
+    if (existingUsername) {
+      return { error: "Email or username already exists", message: null, user: null };
+    }
 
-    const userCount = await db.getRepository(User).count();
-    const isFirstUser = userCount === 0;
+    const count = await db.$count(userTable);
+    const isFirstUser = count === 0;
 
-    const newUser = db.getRepository(User).create({
+    const [newUser] = await db.insert(userTable).values({
       email: sanitizeString(email).toLowerCase(),
       username: sanitizeString(username).toLowerCase(),
-      passwordHash,
+      passwordHash: hashPassword(password),
       role: isFirstUser ? "admin" : "reader",
       isActive: true,
-    });
-
-    const saved = await db.getRepository(User).save(newUser);
+    }).returning();
 
     if (isFirstUser) {
       const cookieStore = await cookies();
@@ -112,18 +78,10 @@ export async function registerService({
       });
     }
 
-    return {
-      error: null,
-      message: "User registered successfully",
-      user: toPublicUser(saved),
-    };
+    return { error: null, message: "User registered successfully", user: toPublicUser(newUser) };
   } catch (error) {
     console.error("Registration error:", error);
-    return {
-      error: "Failed to register user",
-      message: null,
-      user: null,
-    };
+    return { error: "Failed to register user", message: null, user: null };
   }
 }
 
@@ -131,64 +89,57 @@ export async function loginService({
   email,
   password,
   remember,
-}: UserLoginReq): Promise<UserLoginRes> {
+}: { email: string; password: string; remember: boolean }): Promise<{
+  error: string | null;
+  message: string | null;
+  user: (PublicUser & { token: string }) | null;
+}> {
   try {
-    const db = await getDB();
-    const user = await db.getRepository(User).findOneBy({
-      email: email.toLowerCase(),
+    const found = await db.query.user.findFirst({
+      where: eq(userTable.email, email.toLowerCase()),
     });
 
-    if (!user) {
-      return {
-        error: "Invalid email or password",
-        message: null,
-        user: null,
-      };
+    if (!found) {
+      return { error: "Invalid email or password", message: null, user: null };
     }
 
-    if (!user.isActive) {
-      return {
-        error: "Account is disabled",
-        message: null,
-        user: null,
-      };
+    if (!found.isActive) {
+      return { error: "Account is disabled", message: null, user: null };
     }
 
-    const isValidPassword = verifyPassword(password, user.passwordHash);
-    if (!isValidPassword) {
-      return {
-        error: "Invalid email or password",
-        message: null,
-        user: null,
-      };
+    if (!verifyPassword(password, found.passwordHash)) {
+      return { error: "Invalid email or password", message: null, user: null };
     }
 
-    const publicUser = toPublicUser(user);
+    const publicUser = toPublicUser(found);
     const token = signToken(publicUser);
 
     const cookieStore = await cookies();
-    cookieStore.set("auth_token", token, authCookieOpts);
+    cookieStore.set("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
 
     if (remember) {
       const refreshToken = signRefreshToken(publicUser);
-      cookieStore.set("refresh_token", refreshToken, refreshCookieOpts);
+      cookieStore.set("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 15,
+      });
     }
 
-    user.lastLoginAt = new Date();
-    await db.getRepository(User).save(user);
+    await db.update(userTable).set({ lastLoginAt: new Date() }).where(eq(userTable.id, found.id));
 
-    return {
-      error: null,
-      message: "Login successful",
-      user: { ...publicUser, token },
-    };
+    return { error: null, message: "Login successful", user: { ...publicUser, token } };
   } catch (error) {
     console.error("Login error:", error);
-    return {
-      error: "Failed to login",
-      message: null,
-      user: null,
-    };
+    return { error: "Failed to login", message: null, user: null };
   }
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, signToken, signRefreshToken } from "@/lib/jwt";
-import { User } from "@/types/user";
+
+type User = { id: number; email: string; role: string };
 
 const authCookieOpts = {
   httpOnly: true,

@@ -1,4 +1,12 @@
-import { Project } from "@/types/project";
+type Project = {
+  id: number;
+  title: string;
+  description: string;
+  url?: string | null;
+  imageUrl?: string | null;
+  tags: unknown;
+  status: string;
+};
 
 export default function ProjectCard({ project }: { project: Project }) {
   const { title, url, imageUrl, description, tags, status } = project;
@@ -47,9 +55,9 @@ export default function ProjectCard({ project }: { project: Project }) {
         } p-2 px-3 text-justify bg-card text-foreground shadow-md`}
       >
         <p className="text-xs mb-3">{description}</p>
-        {tags.length > 0 && (
+        {Array.isArray(tags) && tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
-            {tags.map((tag, index) => (
+            {tags.map((tag: string, index: number) => (
               <span key={index} className="text-xs bg-primary/20 px-2 py-1 rounded">
                 {tag}
               </span>

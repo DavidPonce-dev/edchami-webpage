@@ -8,8 +8,9 @@ import {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import { User } from "@/types/user";
 import { logout as logoutAction } from "@/lib/auth";
+
+type User = { id: number; email: string; username: string; role: string; profilePicture?: string };
 
 interface AuthContextValue {
   user: User | null;

@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { getDB } from "@/lib/db";
-import { Project } from "@/entities/Project";
+import { eq, desc } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { project as projectTable } from "@/lib/db/schema";
 import { ProjectFormSchema, type ProjectFormState } from "@/validations/project";
 import { getUser } from "@/lib/auth";
 import { sanitizeString, validateUrl, sanitizeTags } from "@/lib/security";
@@ -26,21 +27,19 @@ function sanitizeProjectInput(fields: {
   };
 }
 
-export async function getProjects(): Promise<Project[]> {
+export async function getProjects() {
   try {
-    const db = await getDB();
-    return db.getRepository(Project).find({ order: { createdAt: "DESC" } });
+    return db.query.project.findMany({ orderBy: desc(projectTable.createdAt) });
   } catch (error) {
     console.error("Failed to fetch projects:", error);
     return [];
   }
 }
 
-export async function getProjectById(id: number): Promise<Project | null> {
+export async function getProjectById(id: number) {
   if (!Number.isInteger(id) || id <= 0) return null;
   try {
-    const db = await getDB();
-    return db.getRepository(Project).findOneBy({ id });
+    return db.query.project.findFirst({ where: eq(projectTable.id, id) });
   } catch (error) {
     console.error("Failed to fetch project:", error);
     return null;
@@ -79,16 +78,14 @@ export async function createProject(
   const sanitized = sanitizeProjectInput(validatedFields.data);
 
   try {
-    const db = await getDB();
-    const project = db.getRepository(Project).create({
+    await db.insert(projectTable).values({
       title: sanitized.title,
       description: sanitized.description,
       url: sanitized.url || undefined,
       imageUrl: sanitized.imageUrl || undefined,
-      tags: sanitized.tags,
+      tags: sanitized.tags as string[],
       status: sanitized.status,
     });
-    await db.getRepository(Project).save(project);
     revalidatePath("/projects");
     revalidatePath("/admin");
     return { success: true, message: "Project created successfully" };
@@ -135,21 +132,20 @@ export async function updateProject(
   const sanitized = sanitizeProjectInput(validatedFields.data);
 
   try {
-    const db = await getDB();
-    const project = await db.getRepository(Project).findOneBy({ id });
-    if (!project) {
+    const existing = await db.query.project.findFirst({ where: eq(projectTable.id, id) });
+    if (!existing) {
       return { success: false, message: "Project not found" };
     }
 
-    db.getRepository(Project).merge(project, {
+    await db.update(projectTable).set({
       title: sanitized.title,
       description: sanitized.description,
       url: sanitized.url || undefined,
       imageUrl: sanitized.imageUrl || undefined,
-      tags: sanitized.tags,
+      tags: sanitized.tags as string[],
       status: sanitized.status,
-    });
-    await db.getRepository(Project).save(project);
+    }).where(eq(projectTable.id, id));
+
     revalidatePath("/projects");
     revalidatePath("/admin");
     return { success: true, message: "Project updated successfully" };
@@ -170,13 +166,12 @@ export async function deleteProject(id: number): Promise<{ success: boolean; mes
   }
 
   try {
-    const db = await getDB();
-    const project = await db.getRepository(Project).findOneBy({ id });
-    if (!project) {
+    const existing = await db.query.project.findFirst({ where: eq(projectTable.id, id) });
+    if (!existing) {
       return { success: false, message: "Project not found" };
     }
 
-    await db.getRepository(Project).remove(project);
+    await db.delete(projectTable).where(eq(projectTable.id, id));
     revalidatePath("/projects");
     revalidatePath("/admin");
     return { success: true, message: "Project deleted successfully" };

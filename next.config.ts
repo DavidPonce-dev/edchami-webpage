@@ -21,7 +21,7 @@ const cacheHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  serverExternalPackages: ["typeorm", "pg", "reflect-metadata"],
+  serverExternalPackages: ["postgres"],
   images: {
     remotePatterns: [
       {
