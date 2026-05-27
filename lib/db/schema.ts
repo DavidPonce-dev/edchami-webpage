@@ -24,3 +24,6 @@ export const project = pgTable("project", {
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 });
+
+export type User = typeof user.$inferSelect;
+export type Project = typeof project.$inferSelect;

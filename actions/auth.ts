@@ -4,17 +4,28 @@ import { redirect } from "next/navigation";
 
 import { SignupFormSchema, SigninFormSchema, type FormState } from "@/validations/auth";
 import { loginService, registerService } from "@/lib/auth";
+import { rateLimitAuth } from "@/lib/rate-limit";
 
 export async function registerAction(
   prevState: FormState | null,
   formData: FormData,
 ): Promise<FormState | null> {
-  const password = formData?.get("password") as string;
-  const confirmPassword = formData?.get("confirmPassword") as string;
+  const email = formData.get("email") as string;
+  const rateLimit = rateLimitAuth(email || "unknown");
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
+      zodErrors: null,
+    };
+  }
+
+  const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
   const fields = {
     password,
-    email: formData?.get("email") as string,
-    username: formData?.get("username") as string,
+    email,
+    username: formData.get("username") as string,
   };
 
   const validatedFields = SignupFormSchema.safeParse(fields);
@@ -51,11 +62,21 @@ export async function registerAction(
   redirect("/login");
 }
 
-export async function loginAction( prevState: FormState | null, formData: FormData): Promise<FormState | null> {
+export async function loginAction(prevState: FormState | null, formData: FormData): Promise<FormState | null> {
+  const email = formData.get("email") as string;
+  const rateLimit = rateLimitAuth(email || "unknown");
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
+      zodErrors: null,
+    };
+  }
+
   const fields = {
-    password: formData?.get("password") as string,
-    email: formData?.get("email") as string,
-    remember: formData?.get("remember") === "on",
+    password: formData.get("password") as string,
+    email,
+    remember: formData.get("remember") === "on",
   };
 
   const validatedFields = SigninFormSchema.safeParse(fields);

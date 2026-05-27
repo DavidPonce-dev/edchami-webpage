@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, signToken, signRefreshToken } from "@/lib/jwt";
+import { rateLimitAuth } from "@/lib/rate-limit";
 
 type User = { id: number; email: string; role: string };
 
@@ -8,7 +9,7 @@ const authCookieOpts = {
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/",
-  maxAge: 60 * 60 * 24,
+  maxAge: 60 * 60,
 };
 
 const refreshCookieOpts = {
@@ -20,6 +21,15 @@ const refreshCookieOpts = {
 };
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const rateLimit = rateLimitAuth(`refresh:${ip}`);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: `Too many requests. Retry after ${rateLimit.retryAfter}s` },
+      { status: 429 },
+    );
+  }
+
   const authToken = request.cookies.get("auth_token")?.value || "";
   const refreshToken = request.cookies.get("refresh_token")?.value || "";
 

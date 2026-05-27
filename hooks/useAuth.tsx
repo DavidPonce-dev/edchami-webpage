@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { logout as logoutAction } from "@/lib/auth";
+import { logger } from "@/lib/logger";
 
 type User = { id: number; email: string; username: string; role: string; profilePicture?: string };
 
@@ -24,7 +25,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    return { user: null, setUser: () => {}, logout: async () => {}, isLoading: false };
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return ctx;
 }
@@ -54,7 +55,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
       })
       .catch((err) => {
         if ((err as Error).name !== "AbortError") {
-          console.error("Failed to fetch session", err);
+          logger.error("Failed to fetch session", err);
         }
       })
       .finally(() => setIsLoading(false));

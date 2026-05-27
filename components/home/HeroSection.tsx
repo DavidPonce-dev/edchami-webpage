@@ -21,7 +21,7 @@ export function HeroSection({ name, titles, interests, imageUrl }: HeroSectionPr
               loading="eager"
             />
           </div>
-          <div className="my-5 text-center md:text-left text-1xl md:text-2xl glitch">
+          <div className="my-5 text-center md:text-left text-xl md:text-2xl glitch">
             <h1 className="text-3xl md:text-5xl font-bold">{name}</h1>
             {titles.map((title) => (
               <p key={title}>{title}</p>

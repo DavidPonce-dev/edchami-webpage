@@ -40,7 +40,10 @@ export function PersonSchema() {
       "@type": "Country",
       name: "Chile",
     },
-    sameAs: [],
+    sameAs: [
+      "https://github.com/edchami",
+      "https://linkedin.com/in/edchami",
+    ],
   };
 
   return (

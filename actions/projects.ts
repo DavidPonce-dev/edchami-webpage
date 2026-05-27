@@ -7,7 +7,8 @@ import { db } from "@/lib/db";
 import { project as projectTable } from "@/lib/db/schema";
 import { ProjectFormSchema, type ProjectFormState } from "@/validations/project";
 import { getUser } from "@/lib/auth";
-import { sanitizeString, validateUrl, sanitizeTags } from "@/lib/security";
+import { sanitizeTags, validateUrl } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
 function sanitizeProjectInput(fields: {
   title: string;
@@ -18,8 +19,8 @@ function sanitizeProjectInput(fields: {
   status: "pending" | "onDevelopment" | "finished";
 }) {
   return {
-    title: sanitizeString(fields.title).slice(0, 255),
-    description: sanitizeString(fields.description).slice(0, 2000),
+    title: fields.title.trim().slice(0, 255),
+    description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
     imageUrl: validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
@@ -31,7 +32,7 @@ export async function getProjects() {
   try {
     return db.query.project.findMany({ orderBy: desc(projectTable.createdAt) });
   } catch (error) {
-    console.error("Failed to fetch projects:", error);
+    logger.error("Failed to fetch projects:", error);
     return [];
   }
 }
@@ -41,7 +42,7 @@ export async function getProjectById(id: number) {
   try {
     return db.query.project.findFirst({ where: eq(projectTable.id, id) });
   } catch (error) {
-    console.error("Failed to fetch project:", error);
+    logger.error("Failed to fetch project:", error);
     return null;
   }
 }
@@ -55,14 +56,14 @@ export async function createProject(
     return { success: false, message: "Unauthorized: Admin access required" };
   }
 
-  const rawTags = formData?.get("tags") as string;
+  const rawTags = formData.get("tags") as string;
   const fields = {
-    title: formData?.get("title") as string,
-    description: formData?.get("description") as string,
-    url: (formData?.get("url") as string) || null,
-    imageUrl: (formData?.get("imageUrl") as string) || null,
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    url: (formData.get("url") as string) || null,
+    imageUrl: (formData.get("imageUrl") as string) || null,
     tags: rawTags ? rawTags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],
-    status: (formData?.get("status") as "pending" | "onDevelopment" | "finished") || "pending",
+    status: (formData.get("status") as "pending" | "onDevelopment" | "finished") || "pending",
   };
 
   const validatedFields = ProjectFormSchema.safeParse(fields);
@@ -83,14 +84,14 @@ export async function createProject(
       description: sanitized.description,
       url: sanitized.url || undefined,
       imageUrl: sanitized.imageUrl || undefined,
-      tags: sanitized.tags as string[],
+      tags: sanitized.tags,
       status: sanitized.status,
     });
     revalidatePath("/projects");
     revalidatePath("/admin");
     return { success: true, message: "Project created successfully" };
   } catch (error) {
-    console.error("Failed to create project:", error);
+    logger.error("Failed to create project:", error);
     return { success: false, message: "Failed to create project" };
   }
 }
@@ -109,14 +110,14 @@ export async function updateProject(
     return { success: false, message: "Unauthorized: Admin access required" };
   }
 
-  const rawTags = formData?.get("tags") as string;
+  const rawTags = formData.get("tags") as string;
   const fields = {
-    title: formData?.get("title") as string,
-    description: formData?.get("description") as string,
-    url: (formData?.get("url") as string) || null,
-    imageUrl: (formData?.get("imageUrl") as string) || null,
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    url: (formData.get("url") as string) || null,
+    imageUrl: (formData.get("imageUrl") as string) || null,
     tags: rawTags ? rawTags.split(",").map((t: string) => t.trim()).filter(Boolean) : [],
-    status: (formData?.get("status") as "pending" | "onDevelopment" | "finished") || "pending",
+    status: (formData.get("status") as "pending" | "onDevelopment" | "finished") || "pending",
   };
 
   const validatedFields = ProjectFormSchema.safeParse(fields);
@@ -142,7 +143,7 @@ export async function updateProject(
       description: sanitized.description,
       url: sanitized.url || undefined,
       imageUrl: sanitized.imageUrl || undefined,
-      tags: sanitized.tags as string[],
+      tags: sanitized.tags,
       status: sanitized.status,
     }).where(eq(projectTable.id, id));
 
@@ -150,7 +151,7 @@ export async function updateProject(
     revalidatePath("/admin");
     return { success: true, message: "Project updated successfully" };
   } catch (error) {
-    console.error("Failed to update project:", error);
+    logger.error("Failed to update project:", error);
     return { success: false, message: "Failed to update project" };
   }
 }
@@ -176,7 +177,7 @@ export async function deleteProject(id: number): Promise<{ success: boolean; mes
     revalidatePath("/admin");
     return { success: true, message: "Project deleted successfully" };
   } catch (error) {
-    console.error("Failed to delete project:", error);
+    logger.error("Failed to delete project:", error);
     return { success: false, message: "Failed to delete project" };
   }
 }

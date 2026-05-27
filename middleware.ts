@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { count } from "drizzle-orm";
 
 const SETUP_COOKIE = "setup_complete";
 const PUBLIC_PATHS = ["/register", "/api/setup-status", "/api/og"];
+
+async function checkHasUsers(): Promise<boolean> {
+  try {
+    const result = await db.select({ cnt: count() }).from(user);
+    return result[0].cnt > 0;
+  } catch {
+    return false;
+  }
+}
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -19,25 +31,17 @@ export async function middleware(request: NextRequest) {
 
   if (!setupComplete) {
     try {
-      const baseUrl = request.nextUrl.origin;
-      const response = await fetch(`${baseUrl}/api/setup-status`, {
-        headers: { cookie: request.headers.get("cookie") || "" },
-        cache: "force-cache",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.hasUsers) {
-          const nextResponse = NextResponse.next();
-          nextResponse.cookies.set(SETUP_COOKIE, "true", {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 60 * 60 * 24,
-          });
-          return nextResponse;
-        }
+      const hasUsers = await checkHasUsers();
+      if (hasUsers) {
+        const nextResponse = NextResponse.next();
+        nextResponse.cookies.set(SETUP_COOKIE, "true", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24,
+        });
+        return nextResponse;
       }
     } catch {
       return NextResponse.next();

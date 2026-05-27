@@ -1,12 +1,4 @@
-type Project = {
-  id: number;
-  title: string;
-  description: string;
-  url?: string | null;
-  imageUrl?: string | null;
-  tags: unknown;
-  status: string;
-};
+import type { Project } from "@/lib/db/schema";
 
 export function ProjectCard({ project }: { project: Project }) {
   const { title, url, imageUrl, description, tags, status } = project;

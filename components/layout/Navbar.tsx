@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -46,16 +46,11 @@ export function Navbar() {
     { name: "Inicio", href: "/" },
     { name: "Proyectos", href: "/projects" },
     { name: "Contacto", href: "/contact" },
+    ...(!user ? [
+      { name: "Iniciar sesión", href: "/login" },
+      { name: "Registrarse", href: "/register" },
+    ] : []),
   ];
-
-  useEffect(() => {
-    if (!user) {
-      navLinks.push(
-        { name: "Iniciar sesión", href: "/login" },
-        { name: "Registrarse", href: "/register" },
-      );
-    }
-  }, [user]);
 
   const toggleDarkMode = () => {
     const isDark = document.documentElement.classList.toggle("dark");

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-function getJWTSecret(): string {
+export function getJWTSecret(): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error(
@@ -11,19 +11,17 @@ function getJWTSecret(): string {
   return secret;
 }
 
-const JWT_SECRET = getJWTSecret();
-
 export function signToken(payload: object) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
+  return jwt.sign(payload, getJWTSecret(), { expiresIn: "1h" });
 }
 
 export function signRefreshToken(payload: object) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "15d" });
+  return jwt.sign(payload, getJWTSecret(), { expiresIn: "15d" });
 }
 
 export function verifyToken<T>(token: string) {
   try {
-    return jwt.verify(token, JWT_SECRET) as T;
+    return jwt.verify(token, getJWTSecret()) as T;
   } catch {
     return null;
   }

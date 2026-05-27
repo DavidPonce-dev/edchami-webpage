@@ -1,11 +1,12 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { eq, asc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema";
 import { signToken, signRefreshToken, verifyToken } from "@/lib/jwt";
-import { hashPassword, verifyPassword, sanitizeString } from "@/lib/security";
+import { hashPassword, verifyPassword } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
 export type PublicUser = {
   id: number;
@@ -60,8 +61,8 @@ export async function registerService({
     const isFirstUser = count === 0;
 
     const [newUser] = await db.insert(userTable).values({
-      email: sanitizeString(email).toLowerCase(),
-      username: sanitizeString(username).toLowerCase(),
+      email: email.toLowerCase(),
+      username: username.toLowerCase(),
       passwordHash: hashPassword(password),
       role: isFirstUser ? "admin" : "reader",
       isActive: true,
@@ -80,7 +81,7 @@ export async function registerService({
 
     return { error: null, message: "User registered successfully", user: toPublicUser(newUser) };
   } catch (error) {
-    console.error("Registration error:", error);
+    logger.error("Registration error:", error);
     return { error: "Failed to register user", message: null, user: null };
   }
 }
@@ -120,7 +121,7 @@ export async function loginService({
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24,
+      maxAge: 60 * 60,
     });
 
     if (remember) {
@@ -138,7 +139,7 @@ export async function loginService({
 
     return { error: null, message: "Login successful", user: { ...publicUser, token } };
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error("Login error:", error);
     return { error: "Failed to login", message: null, user: null };
   }
 }

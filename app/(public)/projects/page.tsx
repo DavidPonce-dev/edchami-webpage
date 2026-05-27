@@ -1,6 +1,7 @@
 import { getProjects } from "@/actions/projects";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import type { Metadata } from "next";
+import type { Project } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export default async function ProjectsPage() {
         </h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 text-gray-400">
-        {projects.slice(0, 3).map((project: any) => (
+        {projects.slice(0, 3).map((project: Project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
       </div>
