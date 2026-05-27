@@ -14,9 +14,11 @@ export default function HeroSection({ name, titles, interests, imageUrl }: HeroS
             <img
               src={imageUrl}
               alt={name}
-              width={288}
               height={288}
               className="h-72 w-72 rounded-full mx-auto object-cover"
+              fetchPriority="high"
+              decoding="async"
+              loading="eager"
             />
           </div>
           <div className="my-5 text-center text-opacity-80 md:text-left text-1xl md:text-2xl glitch">
@@ -36,6 +38,9 @@ export default function HeroSection({ name, titles, interests, imageUrl }: HeroS
             width={288}
             height={288}
             className="h-72 w-72 rounded-full object-cover"
+            fetchPriority="high"
+            decoding="async"
+            loading="eager"
           />
         </div>
       </div>

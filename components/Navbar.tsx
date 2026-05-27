@@ -12,7 +12,23 @@ function subscribe(callback: () => void) {
     attributes: true,
     attributeFilter: ["class"],
   });
-  return () => observer.disconnect();
+
+  const onPageHide = () => observer.disconnect();
+  const onPageShow = () => {
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  };
+
+  window.addEventListener("pagehide", onPageHide);
+  window.addEventListener("pageshow", onPageShow);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("pagehide", onPageHide);
+    window.removeEventListener("pageshow", onPageShow);
+  };
 }
 
 function getSnapshot() {

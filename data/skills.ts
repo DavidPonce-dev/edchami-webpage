@@ -70,5 +70,3 @@ export const toolsSkills: Skill[] = [
     image: "/img/skills/typescript.svg",
   },
 ];
-
-export const ideSkills: Skill[] = [];

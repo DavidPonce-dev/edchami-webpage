@@ -51,7 +51,9 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
         router.push("/login");
       }
     } catch (err) {
-      console.error("Failed to refresh session", err);
+      if ((err as Error).name !== "AbortError") {
+        console.error("Failed to refresh session", err);
+      }
     } finally {
       refreshingRef.current = false;
     }
@@ -60,19 +62,31 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   useEffect(() => {
     if (!user || refreshingRef.current) return;
 
+    const controller = new AbortController();
     refreshingRef.current = true;
 
-    fetch("/api/auth/refresh", { method: "POST" })
+    fetch("/api/auth/refresh", {
+      method: "POST",
+      signal: controller.signal,
+    })
       .then((res) => {
         if (res.status === 401) {
           setUser(null);
           router.push("/login");
         }
       })
-      .catch((err) => console.error("Failed to refresh session", err))
+      .catch((err) => {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Failed to refresh session", err);
+        }
+      })
       .finally(() => {
         refreshingRef.current = false;
       });
+
+    return () => {
+      controller.abort();
+    };
   }, [pathname, user, router]);
 
   const logout = useCallback(async () => {

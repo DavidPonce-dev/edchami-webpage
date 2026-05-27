@@ -92,6 +92,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://i.ytimg.com" />
+        <link
+          rel="preload"
+          as="image"
+          href="https://i.ytimg.com/vi/q5tjvJz87rw/maxresdefault.jpg"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
           rel="stylesheet"
