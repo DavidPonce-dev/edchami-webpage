@@ -4,11 +4,10 @@ import {
   createContext,
   useContext,
   useEffect,
-  useRef,
   useState,
   useCallback,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { logout as logoutAction } from "@/lib/auth";
 
@@ -16,7 +15,6 @@ interface AuthContextValue {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
-  refreshSession: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -25,7 +23,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    return { user: null, setUser: () => {}, logout: async () => {}, refreshSession: async () => {}, isLoading: false };
+    return { user: null, setUser: () => {}, logout: async () => {}, isLoading: false };
   }
   return ctx;
 }
@@ -39,8 +37,6 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
   const router = useRouter();
-  const pathname = usePathname();
-  const refreshingRef = useRef(false);
 
   useEffect(() => {
     if (initialUser) return;
@@ -53,72 +49,17 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
         return res.json();
       })
       .then((data) => {
-        if (data?.user) {
-          setUser(data.user);
-        }
+        if (data?.user) setUser(data.user);
       })
       .catch((err) => {
         if ((err as Error).name !== "AbortError") {
           console.error("Failed to fetch session", err);
         }
       })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
 
-    return () => {
-      controller.abort();
-    };
+    return () => controller.abort();
   }, [initialUser]);
-
-  const refreshSession = useCallback(async () => {
-    if (refreshingRef.current || !user) return;
-    refreshingRef.current = true;
-
-    try {
-      const res = await fetch("/api/auth/refresh", { method: "POST" });
-      if (res.status === 401) {
-        setUser(null);
-        router.push("/login");
-      }
-    } catch (err) {
-      if ((err as Error).name !== "AbortError") {
-        console.error("Failed to refresh session", err);
-      }
-    } finally {
-      refreshingRef.current = false;
-    }
-  }, [user, router]);
-
-  useEffect(() => {
-    if (!user || refreshingRef.current) return;
-
-    const controller = new AbortController();
-    refreshingRef.current = true;
-
-    fetch("/api/auth/refresh", {
-      method: "POST",
-      signal: controller.signal,
-    })
-      .then((res) => {
-        if (res.status === 401) {
-          setUser(null);
-          router.push("/login");
-        }
-      })
-      .catch((err) => {
-        if ((err as Error).name !== "AbortError") {
-          console.error("Failed to refresh session", err);
-        }
-      })
-      .finally(() => {
-        refreshingRef.current = false;
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, [pathname, user, router]);
 
   const logout = useCallback(async () => {
     await logoutAction();
@@ -127,7 +68,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, refreshSession, isLoading }}>
+    <AuthContext.Provider value={{ user, setUser, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

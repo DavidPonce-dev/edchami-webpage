@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { FormField } from "@/components/ui/FormField";
-import { MailIcon, GoogleIcon, GitHubIcon } from "@/components/Icons";
+import { MailIcon } from "@/components/Icons";
 
 import { loginAction } from "@/actions/auth";
 import { useActionState } from "react";
@@ -85,38 +85,6 @@ export function LoginForm() {
             Regístrate aquí
           </Link>
         </p>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              O continuar con
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <a
-            href={`${
-              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-            }/api/auth/oauth/google`}
-            className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors text-xs"
-          >
-            <GoogleIcon className="w-5 h-5" />
-            <span className="font-medium">Google</span>
-          </a>
-          <a
-            href={`${
-              process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-            }/api/auth/oauth/github`}
-            className="flex items-center justify-center gap-2 py-2.5 px-4 border border-border rounded-md bg-background text-foreground hover:bg-muted/50 transition-colors text-xs"
-          >
-            <GitHubIcon className="w-5 h-5" />
-            <span className="font-medium">GitHub</span>
-          </a>
-        </div>
       </div>
     </div>
   );

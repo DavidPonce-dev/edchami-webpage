@@ -6,17 +6,7 @@ import { getDB } from "@/lib/db";
 import { Project } from "@/entities/Project";
 import { ProjectFormSchema, type ProjectFormState } from "@/validations/project";
 import { getUser } from "@/lib/auth";
-import {
-  sanitizeString,
-  sanitizeHtml,
-  validateUrl,
-  sanitizeTags,
-  checkRateLimit,
-} from "@/lib/security";
-
-function getRateLimitKey(action: string): string {
-  return `projects:${action}`;
-}
+import { sanitizeString, validateUrl, sanitizeTags } from "@/lib/security";
 
 function sanitizeProjectInput(fields: {
   title: string;
@@ -28,7 +18,7 @@ function sanitizeProjectInput(fields: {
 }) {
   return {
     title: sanitizeString(fields.title).slice(0, 255),
-    description: sanitizeHtml(fields.description).slice(0, 2000),
+    description: sanitizeString(fields.description).slice(0, 2000),
     url: validateUrl(fields.url),
     imageUrl: validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
@@ -39,10 +29,7 @@ function sanitizeProjectInput(fields: {
 export async function getProjects(): Promise<Project[]> {
   try {
     const db = await getDB();
-    const projects = await db.getRepository(Project).find({
-      order: { createdAt: "DESC" },
-    });
-    return projects;
+    return db.getRepository(Project).find({ order: { createdAt: "DESC" } });
   } catch (error) {
     console.error("Failed to fetch projects:", error);
     return [];
@@ -50,14 +37,10 @@ export async function getProjects(): Promise<Project[]> {
 }
 
 export async function getProjectById(id: number): Promise<Project | null> {
-  if (!Number.isInteger(id) || id <= 0) {
-    return null;
-  }
-
+  if (!Number.isInteger(id) || id <= 0) return null;
   try {
     const db = await getDB();
-    const project = await db.getRepository(Project).findOneBy({ id });
-    return project;
+    return db.getRepository(Project).findOneBy({ id });
   } catch (error) {
     console.error("Failed to fetch project:", error);
     return null;
@@ -68,19 +51,9 @@ export async function createProject(
   prevState: ProjectFormState | null,
   formData: FormData,
 ): Promise<ProjectFormState | null> {
-  if (!checkRateLimit(getRateLimitKey("create"), 5, 60 * 1000)) {
-    return {
-      success: false,
-      message: "Too many requests. Please try again later.",
-    };
-  }
-
   const user = await getUser();
   if (user?.role !== "admin") {
-    return {
-      success: false,
-      message: "Unauthorized: Admin access required",
-    };
+    return { success: false, message: "Unauthorized: Admin access required" };
   }
 
   const rawTags = formData?.get("tags") as string;
@@ -94,13 +67,11 @@ export async function createProject(
   };
 
   const validatedFields = ProjectFormSchema.safeParse(fields);
-
   if (!validatedFields.success) {
-    const flattenedErrors = z.flattenError(validatedFields.error);
     return {
       success: false,
       message: "Validation error",
-      zodErrors: flattenedErrors.fieldErrors,
+      zodErrors: z.flattenError(validatedFields.error).fieldErrors,
       data: fields,
     };
   }
@@ -118,20 +89,12 @@ export async function createProject(
       status: sanitized.status,
     });
     await db.getRepository(Project).save(project);
-
     revalidatePath("/projects");
     revalidatePath("/admin");
-
-    return {
-      success: true,
-      message: "Project created successfully",
-    };
+    return { success: true, message: "Project created successfully" };
   } catch (error) {
     console.error("Failed to create project:", error);
-    return {
-      success: false,
-      message: "Failed to create project",
-    };
+    return { success: false, message: "Failed to create project" };
   }
 }
 
@@ -141,25 +104,12 @@ export async function updateProject(
   formData: FormData,
 ): Promise<ProjectFormState | null> {
   if (!Number.isInteger(id) || id <= 0) {
-    return {
-      success: false,
-      message: "Invalid project ID",
-    };
-  }
-
-  if (!checkRateLimit(getRateLimitKey(`update:${id}`), 5, 60 * 1000)) {
-    return {
-      success: false,
-      message: "Too many requests. Please try again later.",
-    };
+    return { success: false, message: "Invalid project ID" };
   }
 
   const user = await getUser();
   if (user?.role !== "admin") {
-    return {
-      success: false,
-      message: "Unauthorized: Admin access required",
-    };
+    return { success: false, message: "Unauthorized: Admin access required" };
   }
 
   const rawTags = formData?.get("tags") as string;
@@ -173,13 +123,11 @@ export async function updateProject(
   };
 
   const validatedFields = ProjectFormSchema.safeParse(fields);
-
   if (!validatedFields.success) {
-    const flattenedErrors = z.flattenError(validatedFields.error);
     return {
       success: false,
       message: "Validation error",
-      zodErrors: flattenedErrors.fieldErrors,
+      zodErrors: z.flattenError(validatedFields.error).fieldErrors,
       data: fields,
     };
   }
@@ -190,10 +138,7 @@ export async function updateProject(
     const db = await getDB();
     const project = await db.getRepository(Project).findOneBy({ id });
     if (!project) {
-      return {
-        success: false,
-        message: "Project not found",
-      };
+      return { success: false, message: "Project not found" };
     }
 
     db.getRepository(Project).merge(project, {
@@ -205,70 +150,38 @@ export async function updateProject(
       status: sanitized.status,
     });
     await db.getRepository(Project).save(project);
-
     revalidatePath("/projects");
     revalidatePath("/admin");
-
-    return {
-      success: true,
-      message: "Project updated successfully",
-    };
+    return { success: true, message: "Project updated successfully" };
   } catch (error) {
     console.error("Failed to update project:", error);
-    return {
-      success: false,
-      message: "Failed to update project",
-    };
+    return { success: false, message: "Failed to update project" };
   }
 }
 
 export async function deleteProject(id: number): Promise<{ success: boolean; message: string }> {
   if (!Number.isInteger(id) || id <= 0) {
-    return {
-      success: false,
-      message: "Invalid project ID",
-    };
-  }
-
-  if (!checkRateLimit(getRateLimitKey(`delete:${id}`), 3, 60 * 1000)) {
-    return {
-      success: false,
-      message: "Too many requests. Please try again later.",
-    };
+    return { success: false, message: "Invalid project ID" };
   }
 
   const user = await getUser();
   if (user?.role !== "admin") {
-    return {
-      success: false,
-      message: "Unauthorized: Admin access required",
-    };
+    return { success: false, message: "Unauthorized: Admin access required" };
   }
 
   try {
     const db = await getDB();
     const project = await db.getRepository(Project).findOneBy({ id });
     if (!project) {
-      return {
-        success: false,
-        message: "Project not found",
-      };
+      return { success: false, message: "Project not found" };
     }
 
     await db.getRepository(Project).remove(project);
-
     revalidatePath("/projects");
     revalidatePath("/admin");
-
-    return {
-      success: true,
-      message: "Project deleted successfully",
-    };
+    return { success: true, message: "Project deleted successfully" };
   } catch (error) {
     console.error("Failed to delete project:", error);
-    return {
-      success: false,
-      message: "Failed to delete project",
-    };
+    return { success: false, message: "Failed to delete project" };
   }
 }

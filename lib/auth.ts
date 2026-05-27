@@ -2,10 +2,9 @@
 
 import { cookies } from "next/headers";
 import { signToken, signRefreshToken, verifyToken } from "@/lib/jwt";
-import { accessTokenCookieOptions, refreshTokenCookieOptions } from "@/lib/settings";
 import { getDB } from "@/lib/db";
 import { User } from "@/entities/User";
-import { hashPassword, verifyPassword, sanitizeString, checkRateLimit } from "@/lib/security";
+import { hashPassword, verifyPassword, sanitizeString } from "@/lib/security";
 import {
   UserLoginRes,
   UserLoginReq,
@@ -13,6 +12,22 @@ import {
   UserRegisterRes,
   User as UserType,
 } from "@/types/user";
+
+const authCookieOpts = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24,
+};
+
+const refreshCookieOpts = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 15,
+};
 
 function toPublicUser(user: User): UserType {
   return {
@@ -57,14 +72,6 @@ export async function registerService({
   password,
   username,
 }: UserRegisterReq): Promise<UserRegisterRes> {
-  if (!checkRateLimit(`register:${email}`, 3, 60 * 1000)) {
-    return {
-      error: "Too many registration attempts. Please try again later.",
-      message: null,
-      user: null,
-    };
-  }
-
   try {
     const db = await getDB();
     const existingUser = await db.getRepository(User).findOne({
@@ -125,14 +132,6 @@ export async function loginService({
   password,
   remember,
 }: UserLoginReq): Promise<UserLoginRes> {
-  if (!checkRateLimit(`login:${email}`, 5, 60 * 1000)) {
-    return {
-      error: "Too many login attempts. Please try again later.",
-      message: null,
-      user: null,
-    };
-  }
-
   try {
     const db = await getDB();
     const user = await db.getRepository(User).findOneBy({
@@ -168,11 +167,11 @@ export async function loginService({
     const token = signToken(publicUser);
 
     const cookieStore = await cookies();
-    cookieStore.set("auth_token", token, accessTokenCookieOptions);
+    cookieStore.set("auth_token", token, authCookieOpts);
 
     if (remember) {
       const refreshToken = signRefreshToken(publicUser);
-      cookieStore.set("refresh_token", refreshToken, refreshTokenCookieOptions);
+      cookieStore.set("refresh_token", refreshToken, refreshCookieOpts);
     }
 
     user.lastLoginAt = new Date();

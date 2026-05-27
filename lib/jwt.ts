@@ -14,7 +14,7 @@ function getJWTSecret(): string {
 const JWT_SECRET = getJWTSecret();
 
 export function signToken(payload: object) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1m" });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
 }
 
 export function signRefreshToken(payload: object) {

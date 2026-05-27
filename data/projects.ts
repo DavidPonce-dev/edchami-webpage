@@ -1,14 +1,13 @@
 import { Project } from "../types/project";
 
 export const useProjects = () => {
-  const t = (key: string) => key;
   const projects: Project[] = [
     {
       id: 1,
-      title: t("projects.spotify2ytMusic.name"),
+      title: "Spotify to YouTube Music",
       url: "#",
       imageUrl: "/img/projects/spotify2yt.jpg",
-      description: t("projects.spotify2ytMusic.description"),
+      description: "Migrador de playlists de Spotify a YouTube Music",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -16,10 +15,10 @@ export const useProjects = () => {
     },
     {
       id: 2,
-      title: t("projects.trello.name"),
+      title: "Trello Clone",
       url: "#",
       imageUrl: "/img/projects/trello.png",
-      description: t("projects.trello.description"),
+      description: "Clon de Trello con tableros, listas y tarjetas",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -27,10 +26,10 @@ export const useProjects = () => {
     },
     {
       id: 3,
-      title: t("projects.paint95.name"),
+      title: "Paint 95",
       url: "#",
       imageUrl: "/img/projects/paint95.png",
-      description: t("projects.paint95.description"),
+      description: "Editor de imágenes con estética Windows 95",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -38,10 +37,10 @@ export const useProjects = () => {
     },
     {
       id: 4,
-      title: t("projects.urlShortener.name"),
+      title: "URL Shortener",
       url: "#",
       imageUrl: "/img/projects/shortener.png",
-      description: t("projects.urlShortener.description"),
+      description: "Acortador de URLs con analytics y QR",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -49,10 +48,10 @@ export const useProjects = () => {
     },
     {
       id: 5,
-      title: t("projects.hostal.name"),
+      title: "Hostal Booking",
       url: "#",
       imageUrl: "/img/projects/hostal.jpg",
-      description: t("projects.hostal.description"),
+      description: "Sistema de reservas para hostal",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -60,10 +59,10 @@ export const useProjects = () => {
     },
     {
       id: 6,
-      title: t("projects.wirelessPedal.name"),
+      title: "Wireless Pedal",
       url: "#",
       imageUrl: "/img/projects/pedal.jpg",
-      description: t("projects.wirelessPedal.description"),
+      description: "Pedal de guitarra inalámbrico con IoT",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -71,10 +70,10 @@ export const useProjects = () => {
     },
     {
       id: 7,
-      title: t("projects.restaurantMenu.name"),
+      title: "Restaurant Menu",
       url: "#",
       imageUrl: "/img/projects/menu-restaurant.webp",
-      description: t("projects.restaurantMenu.description"),
+      description: "Menú digital para restaurante con QR",
       tags: [],
       status: "pending",
       createdAt: new Date(),
@@ -82,10 +81,10 @@ export const useProjects = () => {
     },
     {
       id: 8,
-      title: t("projects.onlineGame.name"),
+      title: "Online Game",
       url: "#",
       imageUrl: "/img/projects/online-game.jpg",
-      description: t("projects.onlineGame.description"),
+      description: "Juego online multijugador",
       tags: [],
       status: "pending",
       createdAt: new Date(),
