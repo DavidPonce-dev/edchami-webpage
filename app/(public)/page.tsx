@@ -1,6 +1,6 @@
-import HeroSection from "@/components/home/HeroSection";
-import DescriptionSection from "@/components/home/DescriptionSection";
-import SkillsSection from "@/components/home/SkillsSection";
+import { HeroSection } from "@/components/home/HeroSection";
+import { DescriptionSection } from "@/components/home/DescriptionSection";
+import { SkillsSection } from "@/components/home/SkillsSection";
 
 export default function Home() {
   return (

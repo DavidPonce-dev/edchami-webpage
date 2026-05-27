@@ -5,7 +5,7 @@ interface HeroSectionProps {
   imageUrl: string;
 }
 
-export default function HeroSection({ name, titles, interests, imageUrl }: HeroSectionProps) {
+export function HeroSection({ name, titles, interests, imageUrl }: HeroSectionProps) {
   return (
     <section className="min-h-96 rounded-md bg-primary text-primary-foreground/80 dark:bg-hero dark:text-hero-foreground">
       <div className="grid md:grid-cols-2">

@@ -175,8 +175,3 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
     </div>
   );
 }
-
-/**
- * Exportaciones para uso en testing y otros componentes.
- */
-export { calculateStrength, strengthLevels };

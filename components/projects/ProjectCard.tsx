@@ -8,7 +8,7 @@ type Project = {
   status: string;
 };
 
-export default function ProjectCard({ project }: { project: Project }) {
+export function ProjectCard({ project }: { project: Project }) {
   const { title, url, imageUrl, description, tags, status } = project;
   const isFinished = status === "finished";
 

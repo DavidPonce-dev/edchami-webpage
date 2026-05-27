@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { getBaseUrl } from "@/lib/getBaseUrl";
+import { getBaseUrl } from "@/lib/utils/getBaseUrl";
 
 export function PersonSchema() {
   const baseUrl = getBaseUrl();

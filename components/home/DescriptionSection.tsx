@@ -3,7 +3,7 @@ interface DescriptionSectionProps {
   paragraphs: string[];
 }
 
-export default function DescriptionSection({ title, paragraphs }: DescriptionSectionProps) {
+export function DescriptionSection({ title, paragraphs }: DescriptionSectionProps) {
   return (
     <section className="p-5 md:p-10 min-h-96">
       <h1 className="text-2xl mb-10 font-bold text-center md:text-left">{title}</h1>

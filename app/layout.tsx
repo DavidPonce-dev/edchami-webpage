@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import { PersonSchema } from "@/components/seo/PersonSchema";
 import { AuthProvider } from "@/hooks/useAuth";
 
-import { getBaseUrl } from "@/lib/getBaseUrl";
+import { getBaseUrl } from "@/lib/utils/getBaseUrl";
 
 export const metadata: Metadata = {
   title: {

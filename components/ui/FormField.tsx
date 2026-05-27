@@ -68,5 +68,3 @@ export function FormField({
     </div>
   );
 }
-
-export { inputStyles };

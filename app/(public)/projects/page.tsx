@@ -1,5 +1,5 @@
 import { getProjects } from "@/actions/projects";
-import ProjectCard from "@/components/projects/ProjectCard";
+import { ProjectCard } from "@/components/projects/ProjectCard";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
