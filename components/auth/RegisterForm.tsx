@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { registerAction } from '@/actions/auth';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { FormField} from '@/components/ui/FormField';
-import { MailIcon } from '@/components/Icons';
+import { Mail } from 'lucide-react';
 import { PasswordStrengthMeter } from '@/components/ui/PasswordStrengthMeter';
 
 function SubmitButton() {
@@ -57,7 +57,7 @@ export function RegisterForm() {
             placeholder="tu_usuario"
             required
             autoComplete="username"
-            icon={<MailIcon className="w-5 h-5" />}
+            icon={<Mail className="w-5 h-5" />}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             error={serverErrors?.username?.[0]}
@@ -71,7 +71,7 @@ export function RegisterForm() {
             placeholder="ejemplo@correo.com"
             required
             autoComplete="email"
-            icon={<MailIcon className="w-5 h-5" />}
+            icon={<Mail className="w-5 h-5" />}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={serverErrors?.email?.[0]}

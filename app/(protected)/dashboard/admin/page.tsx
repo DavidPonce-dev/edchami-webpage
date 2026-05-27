@@ -1,5 +1,5 @@
 import { getUser } from "@/lib/auth";
-import { ShieldIcon } from "@/components/Icons";
+import { Shield } from "lucide-react";
 
 export default async function AdminDashboardPage() {
   const user = await getUser();
@@ -12,7 +12,7 @@ export default async function AdminDashboardPage() {
 
       <div className="bg-card border border-border rounded-lg shadow-lg p-6 w-full max-w-lg">
         <div className="flex items-center gap-3 mb-4">
-          <ShieldIcon className="w-6 h-6 text-destructive" />
+          <Shield className="w-6 h-6 text-destructive" />
           <h2 className="text-lg font-semibold text-card-foreground">
             Admin Dashboard
           </h2>

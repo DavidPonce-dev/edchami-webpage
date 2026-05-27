@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { FormField } from "@/components/ui/FormField";
-import { MailIcon } from "@/components/Icons";
+import { Mail } from "lucide-react";
 
 import { loginAction } from "@/actions/auth";
 import { useActionState } from "react";
@@ -42,7 +42,7 @@ export function LoginForm() {
             placeholder="ejemplo@correo.com"
             required
             autoComplete="email"
-            icon={<MailIcon className="w-5 h-5" />}
+            icon={<Mail className="w-5 h-5" />}
           />
 
           <div className="space-y-1.5">

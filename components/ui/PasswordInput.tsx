@@ -1,7 +1,7 @@
 'use client';
 
 import { InputHTMLAttributes, useState } from 'react';
-import { EyeIcon, EyeOffIcon } from '@/components/Icons';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   showToggle?: boolean;
@@ -26,9 +26,9 @@ export function PasswordInput({ showToggle = true, className = '', error, ...pro
           tabIndex={-1}
         >
           {showPassword ? (
-            <EyeOffIcon className="w-5 h-5" />
+            <EyeOff className="w-5 h-5" />
           ) : (
-            <EyeIcon className="w-5 h-5" />
+            <Eye className="w-5 h-5" />
           )}
         </button>
       )}
