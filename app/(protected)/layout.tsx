@@ -3,6 +3,8 @@ import { getUser } from "@/lib/auth";
 import { AuthProvider } from "@/hooks/useAuth";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 
+export const dynamic = "force-dynamic";
+
 interface LayoutProps {
   children: React.ReactNode;
 }
