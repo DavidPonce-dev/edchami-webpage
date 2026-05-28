@@ -1,14 +1,15 @@
-export default function ProjectsPage() {
+import { getProjects } from '@/actions/projects';
+import { ProjectTable } from '@/components/dashboard/ProjectTable';
+
+export default async function DashboardProjectsPage() {
+  const projects = await getProjects();
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-foreground mb-6">
         Proyectos
       </h1>
-      <div className="bg-card border border-border rounded-lg p-6">
-        <p className="text-muted-foreground">
-          Gestión de proyectos — próximamente.
-        </p>
-      </div>
+      <ProjectTable projects={projects} />
     </div>
   );
 }
