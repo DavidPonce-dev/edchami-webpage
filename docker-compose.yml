@@ -9,8 +9,6 @@ services:
       - .env
     environment:
       - DB_HOST=${DB_HOST:-db}
-    volumes:
-      - uploads_data:/app/public/img/projects
     depends_on:
       db:
         condition: service_healthy
@@ -35,4 +33,3 @@ services:
 
 volumes:
   postgres_data:
-  uploads_data:

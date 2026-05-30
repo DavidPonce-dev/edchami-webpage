@@ -18,7 +18,7 @@ export const project = pgTable("project", {
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description").notNull(),
   url: varchar("url", { length: 255 }),
-  imageUrl: varchar("imageUrl", { length: 255 }),
+  imageUrl: text("imageUrl"),
   tags: jsonb("tags").notNull().default([]),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),

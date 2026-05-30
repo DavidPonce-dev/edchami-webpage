@@ -18,11 +18,14 @@ function sanitizeProjectInput(fields: {
   tags: string[];
   status: "pending" | "onDevelopment" | "finished";
 }) {
+  const isCloudinaryUrl = fields.imageUrl?.includes('res.cloudinary.com');
+  const isLocalPath = fields.imageUrl?.startsWith('/img/projects/');
+  
   return {
     title: fields.title.trim().slice(0, 255),
     description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
-    imageUrl: fields.imageUrl?.startsWith('/img/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
+    imageUrl: (isCloudinaryUrl || isLocalPath) ? fields.imageUrl : validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
     status: fields.status,
   };

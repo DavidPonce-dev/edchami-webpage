@@ -17,10 +17,11 @@ export const ProjectFormSchema = z.object({
     .nullable(),
   imageUrl: z
     .string()
-    .max(255, "Image URL must be less than 255 characters")
+    .max(512, "Image URL must be less than 512 characters")
     .superRefine((val, ctx) => {
       if (!val) return;
       if (val.startsWith('/img/projects/')) return;
+      if (val.includes('res.cloudinary.com')) return;
       try {
         new URL(val);
       } catch {

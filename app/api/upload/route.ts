@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { v2 as cloudinary } from "cloudinary";
 import { logger } from "@/lib/logger";
 import { verifyToken } from "@/lib/jwt";
 import type { PublicUser } from "@/lib/auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const UPLOAD_DIR = join(process.cwd(), "public", "img", "projects");
+const MAX_SIZE = 5 * 1024 * 1024;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 async function getUserFromRequest(request: NextRequest): Promise<PublicUser | null> {
   const token = request.cookies.get("auth_token")?.value;
@@ -23,6 +26,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Unauthorized: Admin access required" },
         { status: 401 }
+      );
+    }
+
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      logger.error("Cloudinary credentials not configured");
+      return NextResponse.json(
+        { error: "Cloudinary not configured" },
+        { status: 500 }
       );
     }
 
@@ -51,23 +62,19 @@ export async function POST(request: NextRequest) {
     }
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const base64 = Buffer.from(bytes).toString("base64");
+    const dataURI = `data:${file.type};base64,${base64}`;
 
-    if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true });
-    }
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: "projects",
+      resource_type: "image",
+      transformation: [
+        { quality: "auto" },
+        { fetch_format: "auto" },
+      ],
+    });
 
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8);
-    const extension = file.type.split("/")[1];
-    const filename = `project-${timestamp}-${random}.${extension}`;
-    const filepath = join(UPLOAD_DIR, filename);
-
-    await writeFile(filepath, buffer);
-
-    const imageUrl = `/img/projects/${filename}`;
-
-    return NextResponse.json({ url: imageUrl }, { status: 200 });
+    return NextResponse.json({ url: result.secure_url }, { status: 200 });
   } catch (error) {
     logger.error("Upload failed:", error);
     return NextResponse.json(
