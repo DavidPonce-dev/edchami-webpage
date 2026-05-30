@@ -47,8 +47,7 @@ export function Navbar() {
     { name: "Proyectos", href: "/projects" },
     { name: "Contacto", href: "/contact" },
     ...(!user ? [
-      { name: "Iniciar sesión", href: "/login" },
-      { name: "Registrarse", href: "/register" },
+      { name: "Login", href: "/login" },
     ] : []),
   ];
 

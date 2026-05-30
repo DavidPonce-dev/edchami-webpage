@@ -18,7 +18,18 @@ export const ProjectFormSchema = z.object({
   imageUrl: z
     .string()
     .max(255, "Image URL must be less than 255 characters")
-    .url("Please enter a valid image URL")
+    .superRefine((val, ctx) => {
+      if (!val) return;
+      if (val.startsWith('/img/projects/')) return;
+      try {
+        new URL(val);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Please enter a valid image URL or upload a file",
+        });
+      }
+    })
     .or(z.literal(""))
     .nullable(),
   tags: z

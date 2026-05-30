@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import type { Project } from '@/lib/db/schema';
 import type { ProjectFormState, ProjectFormValues } from '@/validations/project';
 import { createProject, updateProject } from '@/actions/projects';
 import { X } from 'lucide-react';
+import { ImageDropzone } from './ImageDropzone';
 
 const inputStyles = "w-full px-3 py-2 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
 const textareaStyles = "w-full px-3 py-2 bg-background border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed resize-y min-h-[80px]";
@@ -32,7 +33,14 @@ interface ProjectFormModalProps {
 
 export function ProjectFormModal({ project, mode, onClose, onSuccess }: ProjectFormModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [imageUrl, setImageUrl] = useState('');
   const isEdit = mode === 'edit';
+
+  useEffect(() => {
+    if (isEdit && project?.imageUrl) {
+      setImageUrl(project.imageUrl);
+    }
+  }, [isEdit, project]);
 
   const initialState: ProjectFormState = {
     success: false,
@@ -147,22 +155,13 @@ export function ProjectFormModal({ project, mode, onClose, onSuccess }: ProjectF
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-foreground">
-              URL de imagen
-            </label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              defaultValue={state?.data?.imageUrl || (isEdit && project ? project.imageUrl || '' : '')}
-              className={`${inputStyles} ${state?.zodErrors?.imageUrl ? 'border-destructive focus:ring-destructive' : ''}`}
-              placeholder="https://mi-proyecto.com/imagen.jpg"
-            />
-            {state?.zodErrors?.imageUrl && (
-              <p className="text-sm text-destructive">{state.zodErrors.imageUrl[0]}</p>
-            )}
-          </div>
+          <input type="hidden" name="imageUrl" value={imageUrl} />
+
+          <ImageDropzone
+            value={imageUrl}
+            onChange={setImageUrl}
+            error={state?.zodErrors?.imageUrl?.[0]}
+          />
 
           <div className="space-y-1.5">
             <label htmlFor="tags" className="block text-sm font-medium text-foreground">

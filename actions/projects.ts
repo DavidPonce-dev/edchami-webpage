@@ -22,7 +22,7 @@ function sanitizeProjectInput(fields: {
     title: fields.title.trim().slice(0, 255),
     description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
-    imageUrl: validateUrl(fields.imageUrl),
+    imageUrl: fields.imageUrl?.startsWith('/img/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
     status: fields.status,
   };
