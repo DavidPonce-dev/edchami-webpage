@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
 import { logger } from "@/lib/logger";
 import { verifyToken } from "@/lib/jwt";
 import type { PublicUser } from "@/lib/auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const UPLOAD_DIR = join(process.cwd(), "public", "img", "projects");
 
 async function getUserFromRequest(request: NextRequest): Promise<PublicUser | null> {
   const token = request.cookies.get("auth_token")?.value;
   if (!token) return null;
   return verifyToken<PublicUser>(token);
+}
+
+function generateFileName(originalName: string): string {
+  const ext = originalName.split(".").pop() || "jpg";
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).slice(2, 8);
+  return `${timestamp}-${random}.${ext}`;
 }
 
 export async function POST(request: NextRequest) {
@@ -26,14 +29,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Unauthorized: Admin access required" },
         { status: 401 }
-      );
-    }
-
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-      logger.error("Cloudinary credentials not configured");
-      return NextResponse.json(
-        { error: "Cloudinary not configured" },
-        { status: 500 }
       );
     }
 
@@ -61,20 +56,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString("base64");
-    const dataURI = `data:${file.type};base64,${base64}`;
+    await mkdir(UPLOAD_DIR, { recursive: true });
 
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: "projects",
-      resource_type: "image",
-      transformation: [
-        { quality: "auto" },
-        { fetch_format: "auto" },
-      ],
-    });
+    const fileName = generateFileName(file.name);
+    const filePath = join(UPLOAD_DIR, fileName);
+    const bytes = Buffer.from(await file.arrayBuffer());
 
-    return NextResponse.json({ url: result.secure_url }, { status: 200 });
+    await writeFile(filePath, bytes);
+
+    const imageUrl = `/img/projects/${fileName}`;
+    return NextResponse.json({ url: imageUrl }, { status: 200 });
   } catch (error) {
     logger.error("Upload failed:", error);
     return NextResponse.json(

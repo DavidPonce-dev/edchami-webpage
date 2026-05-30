@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
+import { unlink } from "fs/promises";
+import { join } from "path";
+import { existsSync } from "fs";
 import { db } from "@/lib/db";
 import { project as projectTable } from "@/lib/db/schema";
 import { ProjectFormSchema, type ProjectFormState } from "@/validations/project";
@@ -18,17 +21,31 @@ function sanitizeProjectInput(fields: {
   tags: string[];
   status: "pending" | "onDevelopment" | "finished";
 }) {
-  const isCloudinaryUrl = fields.imageUrl?.includes('res.cloudinary.com');
-  const isLocalPath = fields.imageUrl?.startsWith('/img/projects/');
-  
   return {
     title: fields.title.trim().slice(0, 255),
     description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
-    imageUrl: (isCloudinaryUrl || isLocalPath) ? fields.imageUrl : validateUrl(fields.imageUrl),
+    imageUrl: fields.imageUrl?.startsWith('/img/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
     status: fields.status,
   };
+}
+
+async function deleteLocalImage(imageUrl: string | undefined) {
+  if (!imageUrl || !imageUrl.startsWith('/img/projects/')) return;
+  
+  const fileName = imageUrl.split('/').pop();
+  if (!fileName) return;
+  
+  const filePath = join(process.cwd(), "public", "img", "projects", fileName);
+  
+  if (existsSync(filePath)) {
+    try {
+      await unlink(filePath);
+    } catch (error) {
+      logger.error("Failed to delete local image:", error);
+    }
+  }
 }
 
 export async function getProjects() {
@@ -141,6 +158,10 @@ export async function updateProject(
       return { success: false, message: "Project not found" };
     }
 
+    if (existing.imageUrl && sanitized.imageUrl !== existing.imageUrl) {
+    await deleteLocalImage(existing.imageUrl || undefined);
+    }
+
     await db.update(projectTable).set({
       title: sanitized.title,
       description: sanitized.description,
@@ -174,6 +195,8 @@ export async function deleteProject(id: number): Promise<{ success: boolean; mes
     if (!existing) {
       return { success: false, message: "Project not found" };
     }
+
+    await deleteLocalImage(existing.imageUrl || undefined);
 
     await db.delete(projectTable).where(eq(projectTable.id, id));
     revalidatePath("/projects");

@@ -21,7 +21,6 @@ export const ProjectFormSchema = z.object({
     .superRefine((val, ctx) => {
       if (!val) return;
       if (val.startsWith('/img/projects/')) return;
-      if (val.includes('res.cloudinary.com')) return;
       try {
         new URL(val);
       } catch {
