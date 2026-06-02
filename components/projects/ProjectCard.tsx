@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import type { Project } from "@/lib/db/schema";
 
 export function ProjectCard({ project }: { project: Project }) {
   const { title, url, imageUrl, description, tags, status } = project;
   const isFinished = status === "finished";
+  const [revealed, setRevealed] = useState(false);
 
   const statusLabels: Record<string, string> = {
     pending: "PENDIENTE",
@@ -12,8 +16,22 @@ export function ProjectCard({ project }: { project: Project }) {
 
   const statusLabel = statusLabels[status] || status.toUpperCase();
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    (e.currentTarget as HTMLElement).dataset.startY = String(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const startY = Number((e.currentTarget as HTMLElement).dataset.startY || "0");
+    const endY = e.changedTouches[0].clientY;
+    const delta = startY - endY;
+    if (delta > 40) setRevealed(true);
+    if (delta < -40) setRevealed(false);
+  };
+
   return (
     <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       style={{ backgroundImage: `url(${imageUrl || "/img/projects/default.jpg"})` }}
       className="h-52 relative group overflow-hidden bg-cover hover:opacity-90 bg-card dark:bg-card text-center border-solid border-2 border-border dark:border-border bg-center"
     >
@@ -42,8 +60,8 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
       )}
       <div
-        className={`mx-auto rounded-md w-11/12 h-48 opacity-65 mt-36 ${
-          !isFinished ? "hidden" : "group-hover:mt-0 group-hover:opacity-95"
+        className={`mx-auto rounded-md w-11/12 h-48 opacity-65 mt-36 transition-all duration-300 ${
+          !isFinished && !revealed ? "hidden" : revealed ? "mt-0 opacity-95" : "group-hover:mt-0 group-hover:opacity-95"
         } p-2 px-3 text-justify bg-card text-foreground shadow-md`}
       >
         <p className="text-xs mb-3">{description}</p>
