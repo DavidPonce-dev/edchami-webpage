@@ -10,7 +10,7 @@ export function PersonSchema() {
     name: "Eduardo Chami",
     alternateName: "EdChami",
     url: baseUrl,
-    image: `https://i.ytimg.com/vi/q5tjvJz87rw/maxresdefault.jpg`,
+    image: `${baseUrl}/img/portrait.jpg`,
     jobTitle: "Desarrollador Full Stack & IoT",
     description:
       "Eduardo Chami es desarrollador Full Stack especializado en aplicaciones web modernas, backend escalable, IoT, hardware y robótica. Experiencia con React, Next.js, TypeScript, Node.js y PostgreSQL.",

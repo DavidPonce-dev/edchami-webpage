@@ -1,5 +1,8 @@
 import { MetadataRoute } from "next";
 import { getBaseUrl } from "@/lib/utils/getBaseUrl";
+import { db } from "@/lib/db";
+import { project as projectTable } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
 
 const routes = [
   { path: "/", priority: 1.0 },
@@ -14,10 +17,28 @@ const routes = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
 
-  return routes.map((route) => ({
+  const staticRoutes = routes.map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: new Date(),
-    changeFrequency: route.path === "/" ? "weekly" : "monthly",
+    changeFrequency: route.path === "/" ? "weekly" as const : "monthly" as const,
     priority: route.priority,
   }));
+
+  try {
+    const projects = await db
+      .select({ id: projectTable.id, updatedAt: projectTable.updatedAt })
+      .from(projectTable)
+      .orderBy(desc(projectTable.createdAt));
+
+    const projectRoutes = projects.map((project) => ({
+      url: `${baseUrl}/projects/${project.id}`,
+      lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+
+    return [...staticRoutes, ...projectRoutes];
+  } catch {
+    return staticRoutes;
+  }
 }

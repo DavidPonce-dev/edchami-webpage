@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PersonSchema } from "@/components/seo/PersonSchema";
+import { WebsiteSchema } from "@/components/seo/WebsiteSchema";
 import { AuthProvider } from "@/hooks/useAuth";
 
 import { getBaseUrl } from "@/lib/utils/getBaseUrl";
@@ -121,8 +122,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <AuthProvider initialUser={null}>
-          <PersonSchema />
+          <AuthProvider initialUser={null}>
+            <PersonSchema />
+            <WebsiteSchema />
           <Navbar />
           <div className="mb-auto">
             <div className="xl:w-4/5 mx-auto mt-3 p-5 bg-slate-200 dark:bg-gray-900 shadow-md shadow-slate-500 dark:shadow-black">
