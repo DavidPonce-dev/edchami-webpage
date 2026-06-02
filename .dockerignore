@@ -10,7 +10,7 @@ node_modules
 .vscode
 .idea
 # data/ — needed for build (SkillsSection imports @/data/skills)
-drizzle/
+# drizzle/ — needed for runtime migrations
 *.md
 !README.md
 AGENTS.md
