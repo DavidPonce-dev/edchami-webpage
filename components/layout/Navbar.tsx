@@ -40,15 +40,20 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const darkMode = useSyncExternalStore(subscribe, getSnapshot, () => false);
-  const { user, logout, isLoading } = useAuth();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: "Inicio", href: "/" },
     { name: "Proyectos", href: "/projects" },
     { name: "Contacto", href: "/contact" },
-    ...(!user ? [
-      { name: "Login", href: "/login" },
-    ] : []),
+  ];
+
+  const userLinks = user ? [
+    { name: "Dashboard", href: "/dashboard" },
+    ...(user.role === "admin" ? [{ name: "Admin Panel", href: "/dashboard/admin" }] : []),
+    { name: "Cerrar sesión", href: "#", action: "logout" as const },
+  ] : [
+    { name: "Login", href: "/login" },
   ];
 
   const toggleDarkMode = () => {
@@ -70,7 +75,11 @@ export function Navbar() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-nav-accent-blue via-purple-600 to-nav-accent-burgundy opacity-60 dark:opacity-0" />
         <div className="max-w-screen-xl px-4 py-2 flex flex-col md:flex-row items-center justify-between mx-auto">
           <div className="flex justify-between w-full">
-            <Logo className="me-auto" />
+            <Logo
+              className="me-aut
+            o"
+            />
+            {/* Dark mode toggle */}
             <button
               onClick={toggleDarkMode}
               className="w-8 h-8 me-3 mt-1 flex items-center justify-center rounded-full bg-nav-toggle dark:bg-nav-toggle hover:opacity-80 text-nav-toggle-foreground dark:text-nav-toggle-foreground transition-opacity"
@@ -110,6 +119,8 @@ export function Navbar() {
                 </svg>
               )}
             </button>
+
+            {/* Mobile menu button */}
 
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -156,16 +167,36 @@ export function Navbar() {
                   </Link>
                 </li>
               ))}
+
+              {userLinks.map(({ name, href, action }) => (
+                <li key={name}>
+                  {action === "logout" ? (
+                    <button
+                      onClick={() => { setIsOpen(false); handleLogout(); }}
+                      className="block w-full py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                    >
+                      {name}
+                    </button>
+                  ) : (
+                    <Link
+                      onClick={() => setIsOpen(false)}
+                      href={href}
+                      className={`block py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
+                        isActive(href)
+                          ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
+                          : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                      }`}
+                    >
+                      {name}
+                    </Link>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
-          {isLoading ? (
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="w-14 h-7 bg-nav-text/20 rounded-md animate-pulse" />
-              <div className="w-16 h-7 bg-nav-text/20 rounded-md animate-pulse" />
-            </div>
-          ) : user ? (
-            <div className="relative">
+          {user ? (
+            <div className="relative hidden md:block">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-1 px-3 py-2 text-sm text-nav-text/90 hover:bg-nav-surface-hover dark:hover:bg-gray-800 rounded-md transition-colors"

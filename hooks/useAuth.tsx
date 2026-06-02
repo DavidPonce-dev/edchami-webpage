@@ -17,7 +17,6 @@ interface AuthContextValue {
   user: User | null;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -37,14 +36,12 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser);
-  const [isLoading, setIsLoading] = useState(!initialUser);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     if (initialUser) {
       setUser(initialUser);
-      setIsLoading(false);
       return;
     }
 
@@ -62,8 +59,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
         if ((err as Error).name !== "AbortError") {
           logger.error("Failed to fetch session", err);
         }
-      })
-      .finally(() => setIsLoading(false));
+      });
 
     return () => controller.abort();
   }, [initialUser, pathname]);
@@ -75,7 +71,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
