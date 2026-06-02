@@ -7,7 +7,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { logout as logoutAction } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
@@ -39,9 +39,14 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(initialUser);
   const [isLoading, setIsLoading] = useState(!initialUser);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (initialUser) return;
+    if (initialUser) {
+      setUser(initialUser);
+      setIsLoading(false);
+      return;
+    }
 
     const controller = new AbortController();
 
@@ -61,7 +66,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
       .finally(() => setIsLoading(false));
 
     return () => controller.abort();
-  }, [initialUser]);
+  }, [initialUser, pathname]);
 
   const logout = useCallback(async () => {
     await logoutAction();

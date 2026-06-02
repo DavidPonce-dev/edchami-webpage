@@ -6,6 +6,7 @@ import { PersonSchema } from "@/components/seo/PersonSchema";
 import { WebsiteSchema } from "@/components/seo/WebsiteSchema";
 import { AuthProvider } from "@/hooks/useAuth";
 
+import { getUser } from "@/lib/auth";
 import { getBaseUrl } from "@/lib/utils/getBaseUrl";
 
 export const metadata: Metadata = {
@@ -88,7 +89,9 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const user = await getUser();
+
   return (
     <html lang="es" className="h-full antialiased" suppressHydrationWarning>
       <head>
@@ -122,7 +125,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-          <AuthProvider initialUser={null}>
+          <AuthProvider initialUser={user}>
             <PersonSchema />
             <WebsiteSchema />
           <Navbar />
