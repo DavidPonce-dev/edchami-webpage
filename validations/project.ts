@@ -20,7 +20,7 @@ export const ProjectFormSchema = z.object({
     .max(512, "Image URL must be less than 512 characters")
     .superRefine((val, ctx) => {
       if (!val) return;
-      if (val.startsWith('/img/projects/')) return;
+      if (val.startsWith('/api/images/projects/')) return;
       try {
         new URL(val);
       } catch {

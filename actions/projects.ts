@@ -25,19 +25,19 @@ function sanitizeProjectInput(fields: {
     title: fields.title.trim().slice(0, 255),
     description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
-    imageUrl: fields.imageUrl?.startsWith('/img/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
+    imageUrl: fields.imageUrl?.startsWith('/api/images/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
     status: fields.status,
   };
 }
 
 async function deleteLocalImage(imageUrl: string | undefined) {
-  if (!imageUrl || !imageUrl.startsWith('/img/projects/')) return;
+  if (!imageUrl || !imageUrl.startsWith('/api/images/projects/')) return;
   
   const fileName = imageUrl.split('/').pop();
   if (!fileName) return;
   
-  const filePath = join(process.cwd(), "public", "img", "projects", fileName);
+  const filePath = join(process.cwd(), "storage", "img", "projects", fileName);
   
   if (existsSync(filePath)) {
     try {

@@ -10,7 +10,7 @@ services:
     environment:
       - DB_HOST=${DB_HOST:-db}
     volumes:
-      - project_images:/app/public/img/projects
+      - project_images:/app/storage/img/projects
     depends_on:
       db:
         condition: service_healthy

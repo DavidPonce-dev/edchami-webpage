@@ -7,7 +7,7 @@ import type { PublicUser } from "@/lib/auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024;
-const UPLOAD_DIR = join(process.cwd(), "public", "img", "projects");
+const UPLOAD_DIR = join(process.cwd(), "storage", "img", "projects");
 
 async function getUserFromRequest(request: NextRequest): Promise<PublicUser | null> {
   const token = request.cookies.get("auth_token")?.value;
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     await writeFile(filePath, bytes);
 
-    const imageUrl = `/img/projects/${fileName}`;
+    const imageUrl = `/api/images/projects/${fileName}`;
     return NextResponse.json({ url: imageUrl }, { status: 200 });
   } catch (error) {
     logger.error("Upload failed:", error);

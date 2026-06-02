@@ -61,7 +61,7 @@ const nextConfig: NextConfig = {
         headers: cacheHeaders,
       },
       {
-        source: "/img/:path*",
+        source: "/api/images/projects/:path*",
         headers: cacheHeaders,
       },
     ];
