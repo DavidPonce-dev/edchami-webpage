@@ -9,7 +9,7 @@ node_modules
 .next
 .vscode
 .idea
-data/
+# data/ — needed for build (SkillsSection imports @/data/skills)
 drizzle/
 *.md
 !README.md
