@@ -35,9 +35,8 @@ export function HeroSection({ name, titles, interests, imageUrl }: HeroSectionPr
           <img
             src={imageUrl}
             alt={name}
-            width={288}
             height={288}
-            className="h-72 w-72 rounded-full object-cover"
+            className="h-72 rounded-full object-cover"
             fetchPriority="high"
             decoding="async"
             loading="eager"
