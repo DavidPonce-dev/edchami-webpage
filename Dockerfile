@@ -15,16 +15,19 @@ RUN npm run build
 FROM base AS runner
 ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+    adduser --system --uid 1001 nextjs && \
+    apk add --no-cache su-exec
 
 COPY --from=builder /app/public ./public
-RUN mkdir -p public/img/projects && chown -R nextjs:nodejs public/img
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-USER nextjs
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 3000
 ENV PORT=3000 HOSTNAME=0.0.0.0
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["node", "server.js"]
