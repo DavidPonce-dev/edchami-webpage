@@ -1,5 +1,5 @@
 function log(level: "error" | "warn" | "info", message: string, ...args: unknown[]) {
-  if (process.env.NODE_ENV !== "production") {
+  if (level === "error" || process.env.NODE_ENV !== "production") {
     console[level](message, ...args);
   }
 }
