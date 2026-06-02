@@ -14,6 +14,7 @@ export type PublicUser = {
   username: string;
   role: string;
   profilePicture?: string;
+  tokenVersion: number;
 };
 
 function toPublicUser(u: typeof userTable.$inferSelect): PublicUser {
@@ -23,6 +24,7 @@ function toPublicUser(u: typeof userTable.$inferSelect): PublicUser {
     username: u.username,
     role: u.role,
     profilePicture: u.profilePicture || undefined,
+    tokenVersion: u.tokenVersion,
   };
 }
 
@@ -66,6 +68,7 @@ export async function registerService({
       passwordHash: hashPassword(password),
       role: isFirstUser ? "admin" : "reader",
       isActive: true,
+      tokenVersion: 0,
     }).returning();
 
     return { error: null, message: "User registered successfully", user: toPublicUser(newUser) };
@@ -102,7 +105,7 @@ export async function loginService({
     }
 
     const publicUser = toPublicUser(found);
-    const token = signToken(publicUser);
+    const token = signToken({ id: publicUser.id, email: publicUser.email, role: publicUser.role, tokenVersion: publicUser.tokenVersion });
 
     const cookieStore = await cookies();
     cookieStore.set("auth_token", token, {
@@ -114,7 +117,7 @@ export async function loginService({
     });
 
     if (remember) {
-      const refreshToken = signRefreshToken(publicUser);
+      const refreshToken = signRefreshToken({ id: publicUser.id, email: publicUser.email, role: publicUser.role, tokenVersion: publicUser.tokenVersion });
       cookieStore.set("refresh_token", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -133,8 +136,18 @@ export async function loginService({
   }
 }
 
-export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete({ name: "auth_token", path: "/" });
-  cookieStore.delete({ name: "refresh_token", path: "/" });
+export async function logout(): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const user = await getUser();
+    if (user) {
+      await db.update(userTable).set({ tokenVersion: user.tokenVersion + 1 }).where(eq(userTable.id, user.id));
+    }
+    const cookieStore = await cookies();
+    cookieStore.delete({ name: "auth_token", path: "/" });
+    cookieStore.delete({ name: "refresh_token", path: "/" });
+    return { success: true, error: null };
+  } catch (error) {
+    logger.error("Logout error:", error);
+    return { success: false, error: "Failed to logout" };
+  }
 }

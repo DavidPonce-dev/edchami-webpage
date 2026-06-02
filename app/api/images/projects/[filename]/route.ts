@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
+import { readFile, realpath } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 import { logger } from "@/lib/logger";
@@ -27,14 +27,19 @@ export async function GET(
 
     const filePath = join(STORAGE_DIR, safeFilename);
 
-    if (!existsSync(filePath)) {
+    const resolvedPath = await realpath(filePath);
+    if (!resolvedPath.startsWith(STORAGE_DIR)) {
+      return new NextResponse("Invalid filename", { status: 400 });
+    }
+
+    if (!existsSync(resolvedPath)) {
       return new NextResponse("Image not found", { status: 404 });
     }
 
     const ext = safeFilename.split(".").pop()?.toLowerCase() || "";
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
 
-    const buffer = await readFile(filePath);
+    const buffer = await readFile(resolvedPath);
 
     return new NextResponse(buffer, {
       status: 200,

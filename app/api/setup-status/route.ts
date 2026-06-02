@@ -7,7 +7,7 @@ import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
-  const rateLimit = rateLimitDefault(`setup:${ip}`);
+  const rateLimit = await rateLimitDefault(`setup:${ip}`);
 
   try {
     const result = await db.select({ cnt: count() }).from(user);

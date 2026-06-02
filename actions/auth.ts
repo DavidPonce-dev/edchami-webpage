@@ -11,7 +11,7 @@ export async function registerAction(
   formData: FormData,
 ): Promise<FormState | null> {
   const email = formData.get("email") as string;
-  const rateLimit = rateLimitAuth(email || "unknown");
+  const rateLimit = await rateLimitAuth(email || "unknown");
   if (!rateLimit.allowed) {
     return {
       success: false,
@@ -64,7 +64,7 @@ export async function registerAction(
 
 export async function loginAction(prevState: FormState | null, formData: FormData): Promise<FormState | null> {
   const email = formData.get("email") as string;
-  const rateLimit = rateLimitAuth(email || "unknown");
+  const rateLimit = await rateLimitAuth(email || "unknown");
   if (!rateLimit.allowed) {
     return {
       success: false,

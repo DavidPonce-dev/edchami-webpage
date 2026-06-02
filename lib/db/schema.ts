@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, boolean, timestamp, jsonb, integer } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: serial("id").primaryKey(),
@@ -8,6 +8,7 @@ export const user = pgTable("user", {
   passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
   role: varchar("role", { length: 20 }).notNull().default("reader"),
   isActive: boolean("isActive").notNull().default(false),
+  tokenVersion: integer("tokenVersion").notNull().default(0),
   lastLoginAt: timestamp("lastLoginAt"),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),

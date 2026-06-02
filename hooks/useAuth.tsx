@@ -65,9 +65,11 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   }, [initialUser, pathname]);
 
   const logout = useCallback(async () => {
-    await logoutAction();
-    setUser(null);
-    router.push("/login");
+    const result = await logoutAction();
+    if (result.success) {
+      setUser(null);
+      router.push("/login");
+    }
   }, [router]);
 
   return (

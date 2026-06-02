@@ -11,11 +11,11 @@ export function getJWTSecret(): string {
   return secret;
 }
 
-export function signToken(payload: object) {
+export function signToken(payload: Record<string, unknown>) {
   return jwt.sign(payload, getJWTSecret(), { expiresIn: "1h" });
 }
 
-export function signRefreshToken(payload: object) {
+export function signRefreshToken(payload: Record<string, unknown>) {
   return jwt.sign(payload, getJWTSecret(), { expiresIn: "15d" });
 }
 
