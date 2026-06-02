@@ -48,12 +48,9 @@ export function Navbar() {
     { name: "Contacto", href: "/contact" },
   ];
 
-  const userLinks = user ? [
+  const userLinks = [
     { name: "Dashboard", href: "/dashboard" },
-    ...(user.role === "admin" ? [{ name: "Admin Panel", href: "/dashboard/admin" }] : []),
-    { name: "Cerrar sesión", href: "#", action: "logout" as const },
-  ] : [
-    { name: "Login", href: "/login" },
+    { name: "Logout", href: "#", action: "logout" as const },
   ];
 
   const toggleDarkMode = () => {
@@ -75,76 +72,75 @@ export function Navbar() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-nav-accent-blue via-purple-600 to-nav-accent-burgundy opacity-60 dark:opacity-0" />
         <div className="max-w-screen-xl px-4 py-2 flex flex-col md:flex-row items-center justify-between mx-auto">
           <div className="flex justify-between w-full">
-            <Logo
-              className="me-aut
-            o"
-            />
-            {/* Dark mode toggle */}
-            <button
-              onClick={toggleDarkMode}
-              className="w-8 h-8 me-3 mt-1 flex items-center justify-center rounded-full bg-nav-toggle dark:bg-nav-toggle hover:opacity-80 text-nav-toggle-foreground dark:text-nav-toggle-foreground transition-opacity"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="4" />
-                  <line x1="12" y1="2" x2="12" y2="6" />
-                  <line x1="12" y1="18" x2="12" y2="22" />
-                  <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
-                  <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
-                  <line x1="2" y1="12" x2="6" y2="12" />
-                  <line x1="18" y1="12" x2="22" y2="12" />
-                  <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
-                  <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
-                </svg>
-              ) : (
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-            </button>
-
-            {/* Mobile menu button */}
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex p-2 w-10 h-10 justify-center text-sm text-nav-text rounded-lg md:hidden hover:bg-nav-surface-hover focus:outline-none focus:ring-2 focus:ring-nav-ring"
-              aria-controls="navbar"
-              aria-expanded={isOpen}
-              aria-label="Abrir menú de navegación"
-            >
-              <svg
-                className="w-5 h-5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 17 14"
+            <Logo className="me-auto" />
+            <div className="flex">
+              {/* Dark mode toggle */}
+              <button
+                onClick={toggleDarkMode}
+                className="w-8 h-8 me-3 mt-1 flex items-center justify-center rounded-full bg-nav-toggle dark:bg-nav-toggle hover:opacity-80 text-nav-toggle-foreground dark:text-nav-toggle-foreground transition-opacity"
+                aria-label="Toggle dark mode"
               >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M1 1h15M1 7h15M1 13h15"
-                />
-              </svg>
-            </button>
+                {darkMode ? (
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="4" />
+                    <line x1="12" y1="2" x2="12" y2="6" />
+                    <line x1="12" y1="18" x2="12" y2="22" />
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
+                    <line x1="2" y1="12" x2="6" y2="12" />
+                    <line x1="18" y1="12" x2="22" y2="12" />
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Mobile menu button */}
+
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="inline-flex p-2 w-10 h-10 justify-center text-sm text-nav-text rounded-lg md:hidden hover:bg-nav-surface-hover focus:outline-none focus:ring-2 focus:ring-nav-ring"
+                aria-controls="navbar"
+                aria-expanded={isOpen}
+                aria-label="Abrir menú de navegación"
+              >
+                <svg
+                  className="w-5 h-5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 17 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M1 1h15M1 7h15M1 13h15"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div
@@ -168,30 +164,47 @@ export function Navbar() {
                 </li>
               ))}
 
-              {userLinks.map(({ name, href, action }) => (
-                <li key={name}>
-                  {action === "logout" ? (
-                    <button
-                      onClick={() => { setIsOpen(false); handleLogout(); }}
-                      className="block w-full py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
-                    >
-                      {name}
-                    </button>
-                  ) : (
-                    <Link
-                      onClick={() => setIsOpen(false)}
-                      href={href}
-                      className={`block md:hidden py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
-                        isActive(href)
-                          ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
-                          : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
-                      }`}
-                    >
-                      {name}
-                    </Link>
-                  )}
-                </li>
-              ))}
+              {user ? (
+                userLinks.map(({ name, href, action }) => (
+                  <li key={name} className="block md:hidden ">
+                    {action === "logout" ? (
+                      <button
+                        onClick={() => {
+                          setIsOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                      >
+                        {name}
+                      </button>
+                    ) : (
+                      <Link
+                        onClick={() => setIsOpen(false)}
+                        href={href}
+                        className={`block ${name === "Login" ? "" : "md:hidden"} py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
+                          isActive(href)
+                            ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
+                            : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                        }`}
+                      >
+                        {name}
+                      </Link>
+                    )}
+                  </li>
+                ))
+              ) : (
+                <Link
+                  onClick={() => setIsOpen(false)}
+                  href="/login"
+                  className={`block py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
+                    isActive("/login")
+                      ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
+                      : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
+                  }`}
+                >
+                  Login
+                </Link>
+              )}
             </ul>
           </div>
 
