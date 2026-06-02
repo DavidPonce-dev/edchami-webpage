@@ -3,11 +3,14 @@
 .dockerignore
 Dockerfile
 docker-compose*.yml
-.env*.local
+.env
+.env.example
 node_modules
 .next
 .vscode
 .idea
+data/
+drizzle/
 *.md
 !README.md
 AGENTS.md

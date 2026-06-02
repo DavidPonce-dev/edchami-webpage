@@ -15,6 +15,9 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - frontend
+      - backend
 
   db:
     image: postgres:17-alpine
@@ -32,7 +35,14 @@ services:
       timeout: 3s
       retries: 5
     restart: unless-stopped
+    networks:
+      - backend
 
 volumes:
   postgres_data:
   project_images:
+
+networks:
+  frontend:
+  backend:
+    internal: true
