@@ -7,7 +7,7 @@ chown -R nextjs:nodejs /app/storage/img
 
 # Run database migrations before starting the app
 echo "Running database migrations..."
-drizzle-kit migrate --config=drizzle.config.ts
+npx drizzle-kit migrate --config=drizzle.config.ts
 echo "Migrations complete."
 
 # Execute the CMD as the nextjs user

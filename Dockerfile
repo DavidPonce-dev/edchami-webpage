@@ -16,9 +16,11 @@ FROM base AS runner
 ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs && \
-    apk add --no-cache su-exec && \
-    npm install -g drizzle-kit@0.31.10 && \
-    cd /app && npm init -y > /dev/null 2>&1 && npm install drizzle-kit@0.31.10 drizzle-orm@0.45.2 postgres@3.4.9
+    apk add --no-cache su-exec
+
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+RUN npm install --omit=dev
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
