@@ -26,7 +26,11 @@ try {
   console.log("Migrations complete.");
 } catch (err: unknown) {
   const message = err instanceof Error ? err.message : String(err);
-  if (message.includes("already exists")) {
+  const causeMessage = err instanceof Error && err.cause instanceof Error
+    ? err.cause.message
+    : "";
+  const fullMessage = message + " " + causeMessage;
+  if (fullMessage.includes("already exists")) {
     console.log("Migrations already applied (tables exist). Continuing...");
   } else {
     console.error("Migration failed:", err);
