@@ -21,7 +21,18 @@ const client = postgres(getDbUrl(), { max: 1 });
 const db = drizzle(client);
 
 console.log("Running database migrations...");
-await migrate(db, { migrationsFolder: "./drizzle" });
-console.log("Migrations complete.");
+try {
+  await migrate(db, { migrationsFolder: "./drizzle" });
+  console.log("Migrations complete.");
+} catch (err: unknown) {
+  const message = err instanceof Error ? err.message : String(err);
+  if (message.includes("already exists")) {
+    console.log("Migrations already applied (tables exist). Continuing...");
+  } else {
+    console.error("Migration failed:", err);
+    await client.end();
+    process.exit(1);
+  }
+}
 
 await client.end();
