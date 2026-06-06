@@ -1,6 +1,7 @@
-import { migrate } from "drizzle-orm/postgres-js/migrator";
-import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
 
 function getDbUrl(): string {
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
@@ -18,25 +19,52 @@ if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
 }
 
 const client = postgres(getDbUrl(), { max: 1 });
-const db = drizzle(client);
 
 console.log("Running database migrations...");
-try {
-  await migrate(db, { migrationsFolder: "./drizzle" });
-  console.log("Migrations complete.");
-} catch (err: unknown) {
-  const message = err instanceof Error ? err.message : String(err);
-  const causeMessage = err instanceof Error && err.cause instanceof Error
-    ? err.cause.message
-    : "";
-  const fullMessage = message + " " + causeMessage;
-  if (fullMessage.includes("already exists")) {
-    console.log("Migrations already applied (tables exist). Continuing...");
-  } else {
-    console.error("Migration failed:", err);
-    await client.end();
-    process.exit(1);
+
+await client.unsafe(`CREATE SCHEMA IF NOT EXISTS "drizzle"`);
+await client.unsafe(`CREATE TABLE IF NOT EXISTS "drizzle"."__drizzle_migrations" (
+  "id" serial PRIMARY KEY,
+  "hash" text NOT NULL,
+  "created_at" bigint
+)`);
+
+const migrationsDir = "./drizzle";
+const migrationFiles = fs
+  .readdirSync(migrationsDir)
+  .filter((f) => f.endsWith(".sql"))
+  .sort();
+
+for (const file of migrationFiles) {
+  const content = fs.readFileSync(path.join(migrationsDir, file), "utf-8");
+  const hash = crypto.createHash("sha256").update(content).digest("hex");
+
+  const result = await client.unsafe(
+    `SELECT id FROM "drizzle"."__drizzle_migrations" WHERE hash = '${hash}'`
+  );
+
+  if (result.length === 0) {
+    try {
+      await client.unsafe(content);
+      await client.unsafe(
+        `INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('${hash}', ${Date.now()})`
+      );
+      console.log(`  Applied: ${file}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("already exists") || msg.includes("42P07")) {
+        await client.unsafe(
+          `INSERT INTO "drizzle"."__drizzle_migrations" (hash, created_at) VALUES ('${hash}', ${Date.now()})`
+        );
+        console.log(`  Skipped (already applied): ${file}`);
+      } else {
+        console.error(`  Failed: ${file}`, err);
+        await client.end();
+        process.exit(1);
+      }
+    }
   }
 }
 
+console.log("Migrations complete.");
 await client.end();
