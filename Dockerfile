@@ -17,7 +17,8 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs && \
     apk add --no-cache su-exec && \
-    npm install -g drizzle-kit@0.31.10
+    npm install -g drizzle-kit@0.31.10 && \
+    cd /app && npm init -y > /dev/null 2>&1 && npm install drizzle-kit@0.31.10
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
