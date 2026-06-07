@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  Bot,
 } from "lucide-react";
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
 ];
 
 const adminItems = [
+  { name: "Discord Bot", href: "/dashboard/discord", icon: Bot },
   { name: "Admin Panel", href: "/dashboard/admin", icon: Shield },
 ];
 
