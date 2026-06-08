@@ -1,3 +1,7 @@
+declare module "@novnc/novnc" {
+  export default RFB;
+}
+
 declare module "@novnc/novnc/lib/rfb" {
   export default RFB;
 }

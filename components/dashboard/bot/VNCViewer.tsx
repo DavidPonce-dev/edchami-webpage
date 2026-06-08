@@ -1,7 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import RFB from "@novnc/novnc/core/rfb";
+
+interface RFBInstance {
+  scaleViewport: boolean;
+  resizeSession: boolean;
+  viewOnly: boolean;
+  background: string;
+  disconnect(): void;
+  clipboardPasteFrom(text: string): void;
+  addEventListener(type: string, listener: (event: CustomEvent) => void): void;
+}
 
 interface Props {
   wsUrl: string;
@@ -10,7 +19,7 @@ interface Props {
 
 export function VNCViewer({ wsUrl, onDisconnect }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const rfbRef = useRef<RFB | null>(null);
+  const rfbRef = useRef<RFBInstance | null>(null);
   const [status, setStatus] = useState<"connecting" | "connected" | "disconnected" | "error">("connecting");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -28,45 +37,57 @@ export function VNCViewer({ wsUrl, onDisconnect }: Props) {
     setStatus("connecting");
     setErrorMsg("");
 
-    try {
-      const rfb = new RFB(containerRef.current, wsUrl, {
-        shared: true,
-        repeaterID: "",
-      });
+    let cancelled = false;
 
-      rfbRef.current = rfb;
-      rfb.scaleViewport = true;
-      rfb.resizeSession = false;
-      rfb.viewOnly = false;
-      rfb.background = "#000";
+    (async () => {
+      try {
+        const { default: RFB } = await import("@novnc/novnc");
 
-      rfb.addEventListener("connect", () => {
-        setStatus("connected");
-      });
+        if (cancelled || !containerRef.current) return;
 
-      rfb.addEventListener("disconnect", (e: CustomEvent) => {
-        setStatus("disconnected");
-        if (e.detail?.clean === false) {
-          setErrorMsg("Connection lost unexpectedly");
+        const rfb = new RFB(containerRef.current, wsUrl, {
+          shared: true,
+        }) as RFBInstance;
+
+        rfbRef.current = rfb;
+        rfb.scaleViewport = true;
+        rfb.resizeSession = false;
+        rfb.viewOnly = false;
+        rfb.background = "#000";
+
+        rfb.addEventListener("connect", () => {
+          setStatus("connected");
+        });
+
+        rfb.addEventListener("disconnect", (e: CustomEvent) => {
+          setStatus("disconnected");
+          if (e.detail?.clean === false) {
+            setErrorMsg("Connection lost unexpectedly");
+          }
+          onDisconnect?.();
+        });
+
+        rfb.addEventListener("securityfailure", (e: CustomEvent) => {
+          setStatus("error");
+          setErrorMsg(`Security failure: ${e.detail?.reason || "unknown"}`);
+        });
+
+        rfb.addEventListener("credentialsrequired", () => {
+          setStatus("error");
+          setErrorMsg("Authentication required — check bot configuration");
+        });
+      } catch (err) {
+        if (!cancelled) {
+          setStatus("error");
+          setErrorMsg(err instanceof Error ? err.message : "Failed to initialize VNC");
         }
-        onDisconnect?.();
-      });
+      }
+    })();
 
-      rfb.addEventListener("securityfailure", (e: CustomEvent) => {
-        setStatus("error");
-        setErrorMsg(`Security failure: ${e.detail?.reason || "unknown"}`);
-      });
-
-      rfb.addEventListener("credentialsrequired", () => {
-        setStatus("error");
-        setErrorMsg("Authentication required — check bot configuration");
-      });
-    } catch (err) {
-      setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Failed to initialize VNC");
-    }
-
-    return cleanup;
+    return () => {
+      cancelled = true;
+      cleanup();
+    };
   }, [wsUrl, cleanup, onDisconnect]);
 
   return (
