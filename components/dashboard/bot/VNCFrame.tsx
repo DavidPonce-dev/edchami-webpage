@@ -21,7 +21,7 @@ export function VNCFrame({ onClose }: Props) {
 
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
         <iframe
-          src="/api/bot/vnc/?path="
+          src="/api/bot/vnc/vnc.html?autoconnect=true&path=/vnc/websockify"
           className="absolute inset-0 w-full h-full rounded-lg border border-border"
           title="VNC Session"
           allow="clipboard-read; clipboard-write"

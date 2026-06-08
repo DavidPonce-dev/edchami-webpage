@@ -34,6 +34,7 @@ app.prepare().then(() => {
     const { pathname } = parsedUrl;
 
     if (pathname.startsWith("/api/bot/vnc")) {
+      req.url = req.url.replace(/^\/api\/bot/, "");
       vncProxy.web(req, res, { target: BOT_URL });
       return;
     }
@@ -45,6 +46,7 @@ app.prepare().then(() => {
     const { pathname } = parse(req.url || "");
 
     if (pathname && pathname.startsWith("/api/bot/vnc")) {
+      req.url = req.url.replace(/^\/api\/bot/, "");
       vncProxy.ws(req, socket, head);
     }
   });
