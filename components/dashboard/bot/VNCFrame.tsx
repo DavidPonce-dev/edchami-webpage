@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 
 const VNCViewer = dynamic(
   () => import("./VNCViewer").then((m) => ({ default: m.VNCViewer })),
-  { ssr: false, loading: () => <div className="w-full h-full bg-black rounded-lg flex items-center justify-center"><p className="text-white/60 text-sm">Loading VNC...</p></div> }
+  { ssr: false, loading: () => <div className="w-full h-full bg-black rounded-lg flex items-center justify-center"><p className="text-white/60 text-sm">Cargando VNC...</p></div> }
 );
 
 interface Props {
@@ -26,17 +26,12 @@ export function VNCFrame({ onClose }: Props) {
         const { botWsUrl } = await res.json();
 
         if (!cancelled && botWsUrl) {
-          const url = `${botWsUrl}/vnc/websockify`;
-          console.log(`[VNCFrame] Bot WS URL from server: ${url}`);
-          setWsUrl(url);
+          setWsUrl(`${botWsUrl}/vnc/websockify`);
         }
-      } catch (err) {
-        console.error(`[VNCFrame] Failed to fetch bot config:`, err);
+      } catch {
         if (!cancelled) {
           const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-          const fallback = `${protocol}//${window.location.host}/api/bot/vnc/websockify`;
-          console.log(`[VNCFrame] Using fallback: ${fallback}`);
-          setWsUrl(fallback);
+          setWsUrl(`${protocol}//${window.location.host}/api/bot/vnc/websockify`);
         }
       }
     })();
@@ -48,14 +43,14 @@ export function VNCFrame({ onClose }: Props) {
     return (
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">VNC Session</h2>
+          <h2 className="text-lg font-semibold text-foreground">Sesión VNC</h2>
           <button onClick={onClose} className="p-1.5 rounded-md hover:bg-muted transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
           <div className="absolute inset-0 bg-black rounded-lg flex items-center justify-center">
-            <p className="text-white/60 text-sm">Loading VNC config...</p>
+            <p className="text-white/60 text-sm">Cargando configuración VNC...</p>
           </div>
         </div>
       </div>
@@ -65,7 +60,7 @@ export function VNCFrame({ onClose }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">VNC Session</h2>
+        <h2 className="text-lg font-semibold text-foreground">Sesión VNC</h2>
         <button
           onClick={onClose}
           className="p-1.5 rounded-md hover:bg-muted transition-colors"
@@ -81,7 +76,7 @@ export function VNCFrame({ onClose }: Props) {
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
-        Use this interactive session to log in to YouTube manually. Once logged in, click &quot;Extract Cookies&quot; to save the session.
+        Use esta sesión interactiva para iniciar sesión en YouTube manualmente. Una vez autenticado, haga clic en &quot;Extraer cookies&quot; para guardar la sesión.
       </p>
     </div>
   );

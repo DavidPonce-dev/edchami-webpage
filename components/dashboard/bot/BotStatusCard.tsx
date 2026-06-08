@@ -27,19 +27,19 @@ export function BotStatusCard({ status, error, onRefresh, loading }: Props) {
     return (
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Bot Status</h2>
+          <h2 className="text-lg font-semibold text-foreground">Estado del bot</h2>
           <button
             onClick={onRefresh}
             disabled={loading}
             className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
           >
-            {loading ? "Loading..." : "Retry"}
+            {loading ? "Cargando..." : "Reintentar"}
           </button>
         </div>
         <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
           <p className="text-sm text-destructive">{error}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Verify DISCORD_BOT_URL and DISCORD_BOT_TOKEN in your .env
+            Verifique DISCORD_BOT_URL y DISCORD_BOT_TOKEN en su .env
           </p>
         </div>
       </div>
@@ -55,13 +55,13 @@ export function BotStatusCard({ status, error, onRefresh, loading }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Bot Status</h2>
+        <h2 className="text-lg font-semibold text-foreground">Estado del bot</h2>
         <button
           onClick={onRefresh}
           disabled={loading}
           className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50"
         >
-          {loading ? "Loading..." : "Refresh"}
+          {loading ? "Cargando..." : "Actualizar"}
         </button>
       </div>
 
@@ -69,27 +69,27 @@ export function BotStatusCard({ status, error, onRefresh, loading }: Props) {
         <StatusItem
           icon={Cookie}
           label="Cookies"
-          value={status.cookiesValid ? `Valid (${status.cookieCount})` : "Invalid"}
+          value={status.cookiesValid ? `Válidas (${status.cookieCount})` : "Inválidas"}
           color={cookieColor}
         />
         <StatusItem
           icon={Monitor}
-          label="Browser"
-          value={status.browserActive ? "Active" : "Inactive"}
+          label="Navegador"
+          value={status.browserActive ? "Activo" : "Inactivo"}
           color={browserColor}
         />
         <StatusItem
           icon={Globe}
           label="VNC"
-          value={status.vncActive ? "Active" : "Inactive"}
+          value={status.vncActive ? "Activo" : "Inactivo"}
           color={vncColor}
         />
       </div>
 
       {status.ageHours !== null && (
         <p className="text-xs text-muted-foreground mt-3">
-          Cookie age: {status.ageHours < 1 ? "< 1 hour" : `${Math.round(status.ageHours)}h`}
-          {status.lastModified ? ` · Last updated: ${new Date(status.lastModified).toLocaleString()}` : ""}
+          Antigüedad de cookies: {status.ageHours < 1 ? "< 1 hora" : `${Math.round(status.ageHours)}h`}
+          {status.lastModified ? ` · Última actualización: ${new Date(status.lastModified).toLocaleString()}` : ""}
         </p>
       )}
     </div>

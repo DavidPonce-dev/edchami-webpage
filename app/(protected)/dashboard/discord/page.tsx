@@ -44,10 +44,10 @@ export default function DiscordDashboardPage() {
       setStatus(data);
       setError(null);
       addLog(
-        `Status: cookies=${data.cookiesValid ? "valid" : "invalid"} count=${data.cookieCount} browser=${data.browserActive ? "on" : "off"} vnc=${data.vncActive ? "on" : "off"}`,
+        `Estado: cookies=${data.cookiesValid ? "válidas" : "inválidas"} cantidad=${data.cookieCount} navegador=${data.browserActive ? "activo" : "inactivo"} vnc=${data.vncActive ? "activo" : "inactivo"}`,
       );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : "Error desconocido");
     }
   }, [addLog]);
 
@@ -60,40 +60,40 @@ export default function DiscordDashboardPage() {
     addLog(startMsg);
     try {
       const result = await fn();
-      addLog(`Result: ${JSON.stringify(result)}`);
+      addLog(`Resultado: ${JSON.stringify(result)}`);
       toast.success(successMsg);
       await loadStatus();
     } catch (err) {
-      addLog(`Error: ${err instanceof Error ? err.message : "Action failed"}`);
-      toast.error(err instanceof Error ? err.message : "Action failed");
+      addLog(`Error: ${err instanceof Error ? err.message : "Acción fallida"}`);
+      toast.error(err instanceof Error ? err.message : "Acción fallida");
     } finally {
       setLoading(null);
     }
   };
 
   const handleRefreshCookies = () =>
-    withLoading("refresh", () => postAction("api/cookies/refresh"), "Refreshing cookies...", "Cookies refreshed successfully");
+    withLoading("refresh", () => postAction("api/cookies/refresh"), "Actualizando cookies...", "Cookies actualizadas correctamente");
 
   const handleExtractCookies = () =>
-    withLoading("extract", () => postAction("api/cookies/extract"), "Extracting cookies from open browser...", "Cookies extracted successfully");
+    withLoading("extract", () => postAction("api/cookies/extract"), "Extrayendo cookies del navegador...", "Cookies extraídas correctamente");
 
   const handleSetupVNC = () =>
-    withLoading("setup", () => postAction("api/cookies/setup"), "Starting VNC login...", "VNC session started");
+    withLoading("setup", () => postAction("api/cookies/setup"), "Iniciando sesión VNC...", "Sesión VNC iniciada");
 
   const handleStopVNC = () =>
-    withLoading("stop", () => postAction("api/cookies/setup/stop"), "Stopping VNC...", "VNC session stopped");
+    withLoading("stop", () => postAction("api/cookies/setup/stop"), "Deteniendo VNC...", "Sesión VNC detenida");
 
   const handleResetProfile = () =>
-    withLoading("reset", () => postAction("api/profile/reset"), "Force resetting browser profile...", "Profile reset successfully");
+    withLoading("reset", () => postAction("api/profile/reset"), "Restableciendo perfil del navegador...", "Perfil restablecido correctamente");
 
   const handleClearLog = () => setLogs([]);
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Discord Bot</h1>
+        <h1 className="text-2xl font-bold text-foreground">Bot de Discord</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Manage your Charmin Charmeleon bot
+          Gestione su bot Charmin Charmeleon
         </p>
       </div>
 

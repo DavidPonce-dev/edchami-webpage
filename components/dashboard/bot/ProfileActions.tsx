@@ -21,14 +21,14 @@ export function ProfileActions({ onReset, loading }: Props) {
     <div className="bg-card border border-destructive/20 rounded-lg p-6">
       <div className="flex items-center gap-2 mb-4">
         <AlertTriangle className="w-5 h-5 text-destructive" />
-        <h2 className="text-lg font-semibold text-foreground">Danger Zone</h2>
+        <h2 className="text-lg font-semibold text-foreground">Zona de peligro</h2>
       </div>
 
       <div className="p-3 bg-destructive/5 border border-destructive/10 rounded-lg mb-4">
-        <p className="text-sm text-foreground font-medium">Reset Browser Profile</p>
+        <p className="text-sm text-foreground font-medium">Restablecer perfil del navegador</p>
         <p className="text-xs text-muted-foreground mt-1">
-          Kills all Chrome processes and deletes the browser profile directory.
-          You will need to re-login via VNC afterward.
+          Finaliza todos los procesos de Chrome y elimina el directorio del perfil del navegador.
+          Deberá volver a iniciar sesión por VNC después de esta acción.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function ProfileActions({ onReset, loading }: Props) {
           className="flex items-center gap-2 px-4 py-2.5 bg-destructive/10 text-destructive rounded-md text-sm font-medium hover:bg-destructive/20 disabled:opacity-50 transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
-          Reset Profile
+          Restablecer perfil
         </button>
       ) : (
         <div className="flex gap-2">
@@ -48,14 +48,14 @@ export function ProfileActions({ onReset, loading }: Props) {
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2.5 bg-destructive text-destructive-foreground rounded-md text-sm font-medium hover:bg-destructive/90 disabled:opacity-50 transition-colors"
           >
-            {loading ? "Resetting..." : "Confirm Reset"}
+            {loading ? "Restableciendo..." : "Confirmar"}
           </button>
           <button
             onClick={() => setConfirming(false)}
             disabled={loading}
             className="px-4 py-2.5 bg-muted text-foreground rounded-md text-sm font-medium hover:bg-muted/80 disabled:opacity-50 transition-colors"
           >
-            Cancel
+            Cancelar
           </button>
         </div>
       )}
