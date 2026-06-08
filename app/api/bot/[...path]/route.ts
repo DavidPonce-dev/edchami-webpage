@@ -15,6 +15,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 }
 
 async function proxyRequest(request: NextRequest, params: Promise<{ path: string[] }>) {
+  const resolved = await params;
+  const path = resolved.path.join("/");
+
+  if (path.startsWith("vnc/")) {
+    return NextResponse.json(
+      { error: "VNC routes handled by server.js proxy" },
+      { status: 503 }
+    );
+  }
+
   const user = await getUser();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -24,8 +34,6 @@ async function proxyRequest(request: NextRequest, params: Promise<{ path: string
     return NextResponse.json({ error: "Bot not configured" }, { status: 503 });
   }
 
-  const resolved = await params;
-  const path = resolved.path.join("/");
   const url = new URL(request.url);
   const searchParams = url.searchParams.toString();
   const targetUrl = `${BOT_URL}/${path}?token=${encodeURIComponent(BOT_TOKEN)}${searchParams ? `&${searchParams}` : ""}`;

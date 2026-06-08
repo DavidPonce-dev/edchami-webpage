@@ -1,12 +1,26 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { X } from "lucide-react";
+
+const VNCViewer = dynamic(
+  () => import("./VNCViewer").then((m) => ({ default: m.VNCViewer })),
+  { ssr: false, loading: () => <div className="w-full h-full bg-black rounded-lg flex items-center justify-center"><p className="text-white/60 text-sm">Loading VNC...</p></div> }
+);
 
 interface Props {
   onClose: () => void;
 }
 
+function buildWebSocketUrl(): string {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const host = window.location.host;
+  return `${protocol}//${host}/api/bot/vnc/websockify`;
+}
+
 export function VNCFrame({ onClose }: Props) {
+  const wsUrl = buildWebSocketUrl();
+
   return (
     <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
@@ -20,12 +34,9 @@ export function VNCFrame({ onClose }: Props) {
       </div>
 
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-        <iframe
-          src="/api/bot/vnc/vnc.html?autoconnect=true&path=/vnc/websockify"
-          className="absolute inset-0 w-full h-full rounded-lg border border-border"
-          title="VNC Session"
-          allow="clipboard-read; clipboard-write"
-        />
+        <div className="absolute inset-0">
+          <VNCViewer wsUrl={wsUrl} />
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground mt-3">
