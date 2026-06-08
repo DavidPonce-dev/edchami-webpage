@@ -13,9 +13,16 @@ interface Props {
 }
 
 function buildWebSocketUrl(): string {
+  const botWsUrl = process.env.NEXT_PUBLIC_BOT_WS_URL;
+  if (botWsUrl) {
+    console.log(`[VNCFrame] Using NEXT_PUBLIC_BOT_WS_URL: ${botWsUrl}`);
+    return `${botWsUrl}/vnc/websockify`;
+  }
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.host;
-  return `${protocol}//${host}/api/bot/vnc/websockify`;
+  const fallback = `${protocol}//${host}/api/bot/vnc/websockify`;
+  console.log(`[VNCFrame] NEXT_PUBLIC_BOT_WS_URL not set, using fallback: ${fallback}`);
+  return fallback;
 }
 
 export function VNCFrame({ onClose }: Props) {

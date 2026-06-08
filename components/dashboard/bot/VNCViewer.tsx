@@ -41,9 +41,15 @@ export function VNCViewer({ wsUrl, onDisconnect }: Props) {
 
     (async () => {
       try {
+        console.log(`[VNCViewer] Connecting to WebSocket: ${wsUrl}`);
+        console.log(`[VNCViewer] Protocol: ${window.location.protocol}`);
+        console.log(`[VNCViewer] Host: ${window.location.host}`);
+
         const { default: RFB } = await import("@novnc/novnc");
 
         if (cancelled || !containerRef.current) return;
+
+        console.log(`[VNCViewer] RFB module loaded, creating instance`);
 
         const rfb = new RFB(containerRef.current, wsUrl, {
           shared: true,
@@ -55,11 +61,16 @@ export function VNCViewer({ wsUrl, onDisconnect }: Props) {
         rfb.viewOnly = false;
         rfb.background = "#000";
 
+        console.log(`[VNCViewer] RFB instance created, attaching event listeners`);
+
         rfb.addEventListener("connect", () => {
+          console.log(`[VNCViewer] Connected successfully`);
           setStatus("connected");
         });
 
         rfb.addEventListener("disconnect", (e: CustomEvent) => {
+          console.log(`[VNCViewer] Disconnected - clean: ${e.detail?.clean}`);
+          console.log(`[VNCViewer] Event detail: ${JSON.stringify(e.detail)}`);
           setStatus("disconnected");
           if (e.detail?.clean === false) {
             setErrorMsg("Connection lost unexpectedly");
@@ -68,15 +79,18 @@ export function VNCViewer({ wsUrl, onDisconnect }: Props) {
         });
 
         rfb.addEventListener("securityfailure", (e: CustomEvent) => {
+          console.log(`[VNCViewer] Security failure: ${JSON.stringify(e.detail)}`);
           setStatus("error");
           setErrorMsg(`Security failure: ${e.detail?.reason || "unknown"}`);
         });
 
         rfb.addEventListener("credentialsrequired", () => {
+          console.log(`[VNCViewer] Credentials required`);
           setStatus("error");
           setErrorMsg("Authentication required — check bot configuration");
         });
       } catch (err) {
+        console.error(`[VNCViewer] Initialization error:`, err);
         if (!cancelled) {
           setStatus("error");
           setErrorMsg(err instanceof Error ? err.message : "Failed to initialize VNC");
