@@ -13,6 +13,22 @@ import { getUser } from "@/lib/auth";
 import { sanitizeTags, validateUrl } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
+const VALID_IMAGE_NAME = /^[a-zA-Z0-9][a-zA-Z0-9\-_]*\.(?:png|jpe?g|gif|webp|svg|avif)$/i;
+
+function sanitizeImageFilename(imageUrl: string | null): string | null {
+  if (!imageUrl) return null;
+  if (!imageUrl.startsWith('/api/images/projects/')) return validateUrl(imageUrl);
+
+  const fileName = imageUrl.split('/').pop();
+  if (!fileName || !VALID_IMAGE_NAME.test(fileName)) return null;
+
+  const resolved = join(process.cwd(), "storage", "img", "projects", fileName);
+  const expected = join(process.cwd(), "storage", "img", "projects");
+  if (!resolved.startsWith(expected)) return null;
+
+  return imageUrl;
+}
+
 function sanitizeProjectInput(fields: {
   title: string;
   description: string;
@@ -25,7 +41,7 @@ function sanitizeProjectInput(fields: {
     title: fields.title.trim().slice(0, 255),
     description: fields.description.trim().slice(0, 2000),
     url: validateUrl(fields.url),
-    imageUrl: fields.imageUrl?.startsWith('/api/images/projects/') ? fields.imageUrl : validateUrl(fields.imageUrl),
+    imageUrl: sanitizeImageFilename(fields.imageUrl),
     tags: sanitizeTags(fields.tags),
     status: fields.status,
   };
@@ -33,12 +49,12 @@ function sanitizeProjectInput(fields: {
 
 async function deleteLocalImage(imageUrl: string | undefined) {
   if (!imageUrl || !imageUrl.startsWith('/api/images/projects/')) return;
-  
+
   const fileName = imageUrl.split('/').pop();
-  if (!fileName) return;
-  
+  if (!fileName || !VALID_IMAGE_NAME.test(fileName)) return;
+
   const filePath = join(process.cwd(), "storage", "img", "projects", fileName);
-  
+
   if (existsSync(filePath)) {
     try {
       await unlink(filePath);
@@ -158,10 +174,6 @@ export async function updateProject(
       return { success: false, message: "Project not found" };
     }
 
-    if (existing.imageUrl && sanitized.imageUrl !== existing.imageUrl) {
-    await deleteLocalImage(existing.imageUrl || undefined);
-    }
-
     await db.update(projectTable).set({
       title: sanitized.title,
       description: sanitized.description,
@@ -170,6 +182,10 @@ export async function updateProject(
       tags: sanitized.tags,
       status: sanitized.status,
     }).where(eq(projectTable.id, id));
+
+    if (existing.imageUrl && sanitized.imageUrl !== existing.imageUrl) {
+      await deleteLocalImage(existing.imageUrl || undefined);
+    }
 
     revalidatePath("/projects");
     revalidatePath("/admin");
@@ -196,9 +212,9 @@ export async function deleteProject(id: number): Promise<{ success: boolean; mes
       return { success: false, message: "Project not found" };
     }
 
+    await db.delete(projectTable).where(eq(projectTable.id, id));
     await deleteLocalImage(existing.imageUrl || undefined);
 
-    await db.delete(projectTable).where(eq(projectTable.id, id));
     revalidatePath("/projects");
     revalidatePath("/admin");
     return { success: true, message: "Project deleted successfully" };

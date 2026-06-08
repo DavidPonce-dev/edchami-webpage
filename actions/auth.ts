@@ -10,21 +10,11 @@ export async function registerAction(
   prevState: FormState | null,
   formData: FormData,
 ): Promise<FormState | null> {
-  const email = formData.get("email") as string;
-  const rateLimit = await rateLimitAuth(email || "unknown");
-  if (!rateLimit.allowed) {
-    return {
-      success: false,
-      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
-      zodErrors: null,
-    };
-  }
-
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
   const fields = {
     password,
-    email,
+    email: formData.get("email") as string,
     username: formData.get("username") as string,
   };
 
@@ -50,6 +40,15 @@ export async function registerAction(
     };
   }
 
+  const rateLimit = await rateLimitAuth(validatedFields.data.email);
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
+      zodErrors: null,
+    };
+  }
+
   const response = await registerService(validatedFields.data);
 
   if (!response || response.error) {
@@ -63,19 +62,9 @@ export async function registerAction(
 }
 
 export async function loginAction(prevState: FormState | null, formData: FormData): Promise<FormState | null> {
-  const email = formData.get("email") as string;
-  const rateLimit = await rateLimitAuth(email || "unknown");
-  if (!rateLimit.allowed) {
-    return {
-      success: false,
-      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
-      zodErrors: null,
-    };
-  }
-
   const fields = {
     password: formData.get("password") as string,
-    email,
+    email: formData.get("email") as string,
     remember: formData.get("remember") === "on",
   };
 
@@ -87,6 +76,15 @@ export async function loginAction(prevState: FormState | null, formData: FormDat
       success: false,
       message: "Validation error",
       zodErrors: flattenedErrors.fieldErrors,
+    };
+  }
+
+  const rateLimit = await rateLimitAuth(validatedFields.data.email);
+  if (!rateLimit.allowed) {
+    return {
+      success: false,
+      message: `Demasiados intentos. Intente en ${rateLimit.retryAfter} segundos.`,
+      zodErrors: null,
     };
   }
 
