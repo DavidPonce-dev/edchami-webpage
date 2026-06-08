@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { BotStatus } from "@/lib/bot-client";
 import { BotStatusCard } from "@/components/dashboard/bot/BotStatusCard";
 import { CookieManager } from "@/components/dashboard/bot/CookieManager";
-import { BrowserControls } from "@/components/dashboard/bot/BrowserControls";
 import { ProfileActions } from "@/components/dashboard/bot/ProfileActions";
 import { VNCFrame } from "@/components/dashboard/bot/VNCFrame";
 import { ActivityLog, LogEntry } from "@/components/dashboard/bot/ActivityLog";
@@ -84,12 +83,6 @@ export default function DiscordDashboardPage() {
   const handleStopVNC = () =>
     withLoading("stop", () => postAction("api/cookies/setup/stop"), "Stopping VNC...", "VNC session stopped");
 
-  const handleStartBrowser = () =>
-    withLoading("start", () => postAction("api/browser/start"), "Starting headless browser...", "Browser started");
-
-  const handleCloseBrowser = () =>
-    withLoading("close", () => postAction("api/browser/close"), "Closing browser and extracting cookies...", "Browser closed and cookies extracted");
-
   const handleResetProfile = () =>
     withLoading("reset", () => postAction("api/profile/reset"), "Force resetting browser profile...", "Profile reset successfully");
 
@@ -106,8 +99,6 @@ export default function DiscordDashboardPage() {
 
       <BotStatusCard status={status} error={error} onRefresh={loadStatus} loading={loading !== null} />
 
-      {status?.vncActive && <VNCFrame onClose={handleStopVNC} />}
-
       <CookieManager
         vncActive={status?.vncActive || false}
         onRefreshCookies={handleRefreshCookies}
@@ -117,16 +108,11 @@ export default function DiscordDashboardPage() {
         loading={loading}
       />
 
-      <BrowserControls
-        browserActive={status?.browserActive || false}
-        onStartBrowser={handleStartBrowser}
-        onCloseBrowser={handleCloseBrowser}
-        loading={loading}
-      />
-
-      <ProfileActions onReset={handleResetProfile} loading={loading === "reset"} />
+      {status?.vncActive && <VNCFrame onClose={handleStopVNC} />}
 
       <ActivityLog entries={logs} onClear={handleClearLog} />
+
+      <ProfileActions onReset={handleResetProfile} loading={loading === "reset"} />
     </div>
   );
 }
