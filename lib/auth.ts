@@ -73,6 +73,10 @@ export async function registerService({
 
     return { error: null, message: "User registered successfully", user: toPublicUser(newUser) };
   } catch (error) {
+    const pgError = error as { code?: string };
+    if (pgError.code === "23505") {
+      return { error: "Email or username already exists", message: null, user: null };
+    }
     logger.error("Registration error:", error);
     return { error: "Failed to register user", message: null, user: null };
   }
