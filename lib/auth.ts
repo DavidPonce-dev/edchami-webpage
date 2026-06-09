@@ -31,8 +31,43 @@ function toPublicUser(u: typeof userTable.$inferSelect): PublicUser {
 export async function getUser(): Promise<PublicUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
-  if (!token) return null;
-  return verifyToken<PublicUser>(token);
+  if (token) {
+    const verified = verifyToken<PublicUser>(token);
+    if (verified) return verified;
+  }
+
+  // auth_token expired or invalid — try refresh_token
+  const refreshToken = cookieStore.get("refresh_token")?.value;
+  if (!refreshToken) return null;
+
+  const payload = verifyToken<PublicUser>(refreshToken);
+  if (!payload) return null;
+
+  const dbUser = await db.query.user.findFirst({ where: eq(userTable.id, payload.id) });
+  if (!dbUser || !dbUser.isActive) return null;
+
+  if (dbUser.tokenVersion !== payload.tokenVersion) return null;
+
+  const publicUser = toPublicUser(dbUser);
+  const newToken = signToken({ id: publicUser.id, email: publicUser.email, role: publicUser.role, tokenVersion: publicUser.tokenVersion });
+  const newRefreshToken = signRefreshToken({ id: publicUser.id, email: publicUser.email, role: publicUser.role, tokenVersion: publicUser.tokenVersion });
+
+  cookieStore.set("auth_token", newToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60,
+  });
+  cookieStore.set("refresh_token", newRefreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 15,
+  });
+
+  return publicUser;
 }
 
 export async function registerService({
