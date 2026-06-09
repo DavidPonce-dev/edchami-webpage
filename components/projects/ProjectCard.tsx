@@ -28,12 +28,17 @@ export function ProjectCard({ project }: { project: Project }) {
     if (delta < -40) setRevealed(false);
   };
 
+  const handleClick = () => {
+    setRevealed((prev) => !prev);
+  };
+
   return (
     <div
+      onClick={handleClick}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       style={{ backgroundImage: `url(${imageUrl || "/img/projects/default.jpg"})` }}
-      className="h-52 relative group overflow-hidden bg-cover hover:opacity-90 bg-card dark:bg-card text-center border-solid border-2 border-border dark:border-border bg-center"
+      className="h-52 relative group overflow-hidden bg-cover hover:opacity-90 bg-card dark:bg-card text-center border-solid border-2 border-border dark:border-border bg-center cursor-pointer"
     >
       <p className="text-xl text-foreground relative z-10 bg-muted rounded-xl mt-2 w-fit mx-auto px-2 opacity-80">
         {title}
