@@ -165,7 +165,7 @@ export function Navbar() {
 
               {user ? (
                 userLinks.map(({ name, href }) => (
-                  <li key={name} className="block md:hidden ">
+                  <li key={name}>
                       <Link
                         onClick={() => setIsOpen(false)}
                         href={href}
