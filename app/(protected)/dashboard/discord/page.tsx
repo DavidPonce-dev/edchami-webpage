@@ -6,6 +6,7 @@ import { BotStatusCard } from "@/components/dashboard/bot/BotStatusCard";
 import { CookieManager } from "@/components/dashboard/bot/CookieManager";
 import { ProfileActions } from "@/components/dashboard/bot/ProfileActions";
 import { VNCFrame } from "@/components/dashboard/bot/VNCFrame";
+import { GuildList } from "@/components/dashboard/bot/GuildList";
 import { ActivityLog, LogEntry } from "@/components/dashboard/bot/ActivityLog";
 import { toast } from "sonner";
 
@@ -109,6 +110,8 @@ export default function DiscordDashboardPage() {
       />
 
       {status?.vncActive && <VNCFrame onClose={handleStopVNC} />}
+
+      <GuildList />
 
       <ActivityLog entries={logs} onClear={handleClearLog} />
 

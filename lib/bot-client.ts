@@ -130,3 +130,47 @@ export async function closeBrowser(): Promise<BrowserCloseResponse> {
 export async function resetProfile(): Promise<{ message: string }> {
   return request<{ message: string }>("/api/profile/reset", { method: "POST" });
 }
+
+export interface GuildTrack {
+  title: string;
+  url: string;
+  requestedBy: string;
+  duration: string | null;
+  position: number;
+}
+
+export interface GuildMusic {
+  connected: boolean;
+  voiceChannel: string | null;
+  currentTrack: GuildTrack | null;
+  queueSize: number;
+  isPaused: boolean;
+  autoplay: boolean;
+  loopMode: string;
+}
+
+export interface GuildInfo {
+  id: string;
+  name: string;
+  memberCount: number;
+  music: GuildMusic;
+}
+
+export interface GuildsResponse {
+  deployMode: boolean;
+  guilds: GuildInfo[];
+}
+
+export interface DeployToggleResponse {
+  deployMode: boolean;
+  disconnectedGuilds?: number;
+  message: string;
+}
+
+export async function getGuilds(): Promise<GuildsResponse> {
+  return request<GuildsResponse>("/api/guilds");
+}
+
+export async function toggleDeploy(): Promise<DeployToggleResponse> {
+  return request<DeployToggleResponse>("/api/bot/toggle", { method: "POST" });
+}

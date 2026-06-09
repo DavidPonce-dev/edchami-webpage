@@ -23,10 +23,11 @@ export function VNCFrame({ onClose }: Props) {
       try {
         const res = await fetch("/api/bot-config");
         if (!res.ok) throw new Error(`Failed: ${res.status}`);
-        const { botWsUrl } = await res.json();
+        const { botWsUrl, botToken } = await res.json();
 
         if (!cancelled && botWsUrl) {
-          setWsUrl(`${botWsUrl}/vnc/websockify`);
+          const tokenParam = botToken ? `?token=${encodeURIComponent(botToken)}` : "";
+          setWsUrl(`${botWsUrl}/vnc/websockify${tokenParam}`);
         }
       } catch {
         if (!cancelled) {

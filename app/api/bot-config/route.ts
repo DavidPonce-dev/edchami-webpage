@@ -12,5 +12,6 @@ export async function GET() {
 
   return NextResponse.json({
     botWsUrl: wsUrl,
+    botToken: process.env.DISCORD_BOT_TOKEN || "",
   });
 }
