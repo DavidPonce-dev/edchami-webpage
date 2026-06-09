@@ -9,7 +9,6 @@ import {
   FolderOpen,
   User,
   Settings,
-  Shield,
   LogOut,
   Menu,
   X,
@@ -18,14 +17,13 @@ import {
 
 const navItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Proyectos", href: "/dashboard/projects", icon: FolderOpen },
   { name: "Perfil", href: "/dashboard/profile", icon: User },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 const adminItems = [
+  { name: "Proyectos", href: "/dashboard/projects", icon: FolderOpen },
   { name: "Discord Bot", href: "/dashboard/discord", icon: Bot },
-  { name: "Admin Panel", href: "/dashboard/admin", icon: Shield },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 function SidebarContent({ user, isActive, onNavigate }: {
