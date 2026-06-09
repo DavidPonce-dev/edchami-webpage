@@ -34,6 +34,7 @@ export default function DiscordDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [showVNC, setShowVNC] = useState(false);
 
   const addLog = useCallback((message: string) => {
     setLogs((prev) => [...prev, { timestamp: ts(), message }]);
@@ -56,7 +57,7 @@ export default function DiscordDashboardPage() {
     loadStatus();
   }, [loadStatus]);
 
-  const withLoading = async (action: string, fn: () => Promise<unknown>, startMsg: string, successMsg: string) => {
+  const withLoading = async (action: string, fn: () => Promise<unknown>, startMsg: string, successMsg: string): Promise<void> => {
     setLoading(action);
     addLog(startMsg);
     try {
@@ -78,11 +79,15 @@ export default function DiscordDashboardPage() {
   const handleExtractCookies = () =>
     withLoading("extract", () => postAction("api/cookies/extract"), "Extrayendo cookies del navegador...", "Cookies extraídas correctamente");
 
-  const handleSetupVNC = () =>
-    withLoading("setup", () => postAction("api/cookies/setup"), "Iniciando sesión VNC...", "Sesión VNC iniciada");
+  const handleSetupVNC = async () => {
+    setShowVNC(true);
+    return withLoading("setup", () => postAction("api/cookies/setup"), "Iniciando sesión VNC...", "Sesión VNC iniciada");
+  };
 
-  const handleStopVNC = () =>
-    withLoading("stop", () => postAction("api/cookies/setup/stop"), "Deteniendo VNC...", "Sesión VNC detenida");
+  const handleStopVNC = async () => {
+    setShowVNC(false);
+    return withLoading("stop", () => postAction("api/cookies/setup/stop"), "Deteniendo VNC...", "Sesión VNC detenida");
+  };
 
   const handleResetProfile = () =>
     withLoading("reset", () => postAction("api/profile/reset"), "Restableciendo perfil del navegador...", "Perfil restablecido correctamente");
@@ -109,7 +114,7 @@ export default function DiscordDashboardPage() {
         loading={loading}
       />
 
-      {status?.vncActive && <VNCFrame onClose={handleStopVNC} />}
+      {showVNC && <VNCFrame onClose={handleStopVNC} />}
 
       <GuildList />
 
