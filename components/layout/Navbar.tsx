@@ -50,7 +50,6 @@ export function Navbar() {
 
   const userLinks = [
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Logout", href: "#", action: "logout" as const },
   ];
 
   const toggleDarkMode = () => {
@@ -165,23 +164,12 @@ export function Navbar() {
               ))}
 
               {user ? (
-                userLinks.map(({ name, href, action }) => (
+                userLinks.map(({ name, href }) => (
                   <li key={name} className="block md:hidden ">
-                    {action === "logout" ? (
-                      <button
-                        onClick={() => {
-                          setIsOpen(false);
-                          handleLogout();
-                        }}
-                        className="w-full py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
-                      >
-                        {name}
-                      </button>
-                    ) : (
                       <Link
                         onClick={() => setIsOpen(false)}
                         href={href}
-                        className={`block ${name === "Login" ? "" : "md:hidden"} py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
+                        className={`block py-2 px-3 text-center rounded md:no-underline font-retro text-xs transition-colors ${
                           isActive(href)
                             ? "text-nav-text-active bg-nav-surface-active md:bg-nav-surface-active md:text-nav-text-active dark:bg-nav-surface-active dark:md:bg-transparent dark:md:text-nav-text-active"
                             : "text-nav-text hover:bg-nav-accent-burgundy-soft hover:text-nav-accent-burgundy dark:text-nav-text dark:hover:bg-nav-surface-hover"
@@ -189,7 +177,7 @@ export function Navbar() {
                       >
                         {name}
                       </Link>
-                    )}
+                    
                   </li>
                 ))
               ) : (
@@ -208,113 +196,6 @@ export function Navbar() {
             </ul>
           </div>
 
-          {user ? (
-            <div className="relative hidden md:block">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-1 px-3 py-2 text-sm text-nav-text/90 hover:bg-nav-surface-hover dark:hover:bg-gray-800 rounded-md transition-colors"
-                aria-label="Menú de usuario"
-                aria-expanded={showUserMenu}
-              >
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                <svg
-                  className="w-4 h-4 opacity-70"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-
-              {showUserMenu && (
-                <div className="absolute right-0 mt-1 w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 z-50">
-                  <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {user.email.split("@")[0]}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {user.email}
-                    </p>
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="3" width="7" height="7" />
-                      <rect x="14" y="3" width="7" height="7" />
-                      <rect x="14" y="14" width="7" height="7" />
-                      <rect x="3" y="14" width="7" height="7" />
-                    </svg>
-                    Dashboard
-                  </Link>
-                  {user.role === "admin" && (
-                    <Link
-                      href="/dashboard/admin"
-                      onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      </svg>
-                      Admin Panel
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Cerrar sesión
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : null}
         </div>
       </nav>
     </>
