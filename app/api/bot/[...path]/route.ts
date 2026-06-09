@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 const BOT_URL = process.env.DISCORD_BOT_URL || "";
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
@@ -25,7 +25,7 @@ async function proxyRequest(request: NextRequest, params: Promise<{ path: string
     );
   }
 
-  const user = await getUser();
+  const user = await getSession();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }

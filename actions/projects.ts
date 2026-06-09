@@ -9,7 +9,7 @@ import { existsSync } from "fs";
 import { db } from "@/lib/db";
 import { project as projectTable } from "@/lib/db/schema";
 import { ProjectFormSchema, type ProjectFormState } from "@/validations/project";
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { sanitizeTags, validateUrl } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
@@ -87,7 +87,7 @@ export async function createProject(
   prevState: ProjectFormState | null,
   formData: FormData,
 ): Promise<ProjectFormState | null> {
-  const user = await getUser();
+  const user = await getSession();
   if (user?.role !== "admin") {
     return { success: false, message: "Unauthorized: Admin access required" };
   }
@@ -141,7 +141,7 @@ export async function updateProject(
     return { success: false, message: "Invalid project ID" };
   }
 
-  const user = await getUser();
+  const user = await getSession();
   if (user?.role !== "admin") {
     return { success: false, message: "Unauthorized: Admin access required" };
   }
@@ -201,7 +201,7 @@ export async function deleteProject(id: number): Promise<{ success: boolean; mes
     return { success: false, message: "Invalid project ID" };
   }
 
-  const user = await getUser();
+  const user = await getSession();
   if (user?.role !== "admin") {
     return { success: false, message: "Unauthorized: Admin access required" };
   }

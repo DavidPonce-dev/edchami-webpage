@@ -1,8 +1,8 @@
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { Shield } from "lucide-react";
 
 export default async function AdminDashboardPage() {
-  const user = await getUser();
+  const user = await getSession();
 
   return (
     <div className="p-6">

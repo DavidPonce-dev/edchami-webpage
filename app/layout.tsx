@@ -6,7 +6,7 @@ import { PersonSchema } from "@/components/seo/PersonSchema";
 import { WebsiteSchema } from "@/components/seo/WebsiteSchema";
 import { AuthProvider } from "@/hooks/useAuth";
 
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { getBaseUrl } from "@/lib/utils/getBaseUrl";
 
 export const metadata: Metadata = {
@@ -90,7 +90,7 @@ interface RootLayoutProps {
 }
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-  const user = await getUser();
+  const user = await getSession();
 
   return (
     <html lang="es" className="h-full antialiased" suppressHydrationWarning>

@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema";
 import { signToken, signRefreshToken, verifyToken } from "@/lib/jwt";
@@ -28,7 +29,8 @@ function toPublicUser(u: typeof userTable.$inferSelect): PublicUser {
   };
 }
 
-export async function getUser(): Promise<PublicUser | null> {
+// Read-only — safe for Server Components (never writes cookies)
+async function _getSession(): Promise<PublicUser | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
   if (token) {
@@ -37,6 +39,26 @@ export async function getUser(): Promise<PublicUser | null> {
   }
 
   // auth_token expired or invalid — try refresh_token
+  const refreshToken = cookieStore.get("refresh_token")?.value;
+  if (!refreshToken) return null;
+
+  const payload = verifyToken<PublicUser>(refreshToken);
+  if (!payload) return null;
+
+  const dbUser = await db.query.user.findFirst({ where: eq(userTable.id, payload.id) });
+  if (!dbUser || !dbUser.isActive) return null;
+
+  if (dbUser.tokenVersion !== payload.tokenVersion) return null;
+
+  return toPublicUser(dbUser);
+}
+
+// Cached per-request — avoids N+1 queries
+export const getSession = cache(_getSession);
+
+// Server Action — renews cookies when called from client
+export async function refreshTokens(): Promise<PublicUser | null> {
+  const cookieStore = await cookies();
   const refreshToken = cookieStore.get("refresh_token")?.value;
   if (!refreshToken) return null;
 
@@ -177,7 +199,7 @@ export async function loginService({
 
 export async function logout(): Promise<{ success: boolean; error: string | null }> {
   try {
-    const user = await getUser();
+    const user = await getSession();
     if (user) {
       await db.update(userTable).set({ tokenVersion: user.tokenVersion + 1 }).where(eq(userTable.id, user.id));
     }

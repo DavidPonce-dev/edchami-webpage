@@ -1,7 +1,7 @@
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const user = await getUser();
+  const user = await getSession();
 
   return (
     <div className="p-6">

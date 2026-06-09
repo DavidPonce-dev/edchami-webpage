@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ interface LayoutProps {
 }
 
 export default async function ProtectedLayout({ children }: LayoutProps) {
-  const user = await getUser();
+  const user = await getSession();
   if (!user) redirect("/login");
 
   return (
