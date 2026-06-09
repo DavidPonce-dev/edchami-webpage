@@ -76,9 +76,6 @@ export default function DiscordDashboardPage() {
   const handleRefreshCookies = () =>
     withLoading("refresh", () => postAction("api/cookies/refresh"), "Actualizando cookies...", "Cookies actualizadas correctamente");
 
-  const handleExtractCookies = () =>
-    withLoading("extract", () => postAction("api/cookies/extract"), "Extrayendo cookies del navegador...", "Cookies extraídas correctamente");
-
   const handleSetupVNC = async () => {
     setShowVNC(true);
     return withLoading("setup", () => postAction("api/cookies/setup"), "Iniciando sesión VNC...", "Sesión VNC iniciada");
@@ -108,7 +105,6 @@ export default function DiscordDashboardPage() {
       <CookieManager
         vncActive={status?.vncActive || false}
         onRefreshCookies={handleRefreshCookies}
-        onExtractCookies={handleExtractCookies}
         onSetupVNC={handleSetupVNC}
         onStopVNC={handleStopVNC}
         loading={loading}

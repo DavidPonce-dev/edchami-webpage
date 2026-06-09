@@ -1,19 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { Cookie, RefreshCw, Download, MonitorPlay, Square } from "lucide-react";
-import { toast } from "sonner";
+import { Cookie, RefreshCw, MonitorPlay, Square } from "lucide-react";
 
 interface Props {
   vncActive: boolean;
   onRefreshCookies: () => Promise<void>;
-  onExtractCookies: () => Promise<void>;
   onSetupVNC: () => Promise<void>;
   onStopVNC: () => Promise<void>;
   loading: string | null;
 }
 
-export function CookieManager({ vncActive, onRefreshCookies, onExtractCookies, onSetupVNC, onStopVNC, loading }: Props) {
+export function CookieManager({ vncActive, onRefreshCookies, onSetupVNC, onStopVNC, loading }: Props) {
   return (
     <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center gap-2 mb-4">
@@ -28,16 +25,7 @@ export function CookieManager({ vncActive, onRefreshCookies, onExtractCookies, o
           className="flex items-center gap-2 px-4 py-3 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium text-foreground disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading === "refresh" ? "animate-spin" : ""}`} />
-          {loading === "refresh" ? "Actualizando..." : "Actualizar cookies (sin interfaz)"}
-        </button>
-
-        <button
-          onClick={onExtractCookies}
-          disabled={loading !== null}
-          className="flex items-center gap-2 px-4 py-3 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium text-foreground disabled:opacity-50 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          {loading === "extract" ? "Extrayendo..." : "Extraer cookies"}
+          {loading === "refresh" ? "Actualizando..." : "Actualizar cookies"}
         </button>
 
         {!vncActive ? (
@@ -60,14 +48,6 @@ export function CookieManager({ vncActive, onRefreshCookies, onExtractCookies, o
           </button>
         )}
       </div>
-
-      <p className="text-xs text-muted-foreground mt-3">
-        <strong>Actualizar:</strong> Abre el navegador sin interfaz, inicia sesión con la sesión existente y guarda las cookies.
-        <br />
-        <strong>Extraer:</strong> Guarda las cookies del navegador abierto sin cerrarlo.
-        <br />
-        <strong>Sesión VNC:</strong> Lanza un navegador interactivo para iniciar sesión manualmente en YouTube.
-      </p>
     </div>
   );
 }
