@@ -38,9 +38,8 @@ function getSnapshot() {
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const darkMode = useSyncExternalStore(subscribe, getSnapshot, () => false);
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const navLinks = [
     { name: "Inicio", href: "/" },
@@ -55,11 +54,6 @@ export function Navbar() {
   const toggleDarkMode = () => {
     const isDark = document.documentElement.classList.toggle("dark");
     document.cookie = `theme=${isDark ? "dark" : "light"}; path=/; max-age=31536000`;
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    setShowUserMenu(false);
   };
 
   const isActive = (href: string) => pathname === href;
