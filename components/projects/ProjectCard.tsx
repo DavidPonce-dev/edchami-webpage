@@ -69,7 +69,7 @@ export function ProjectCard({ project }: { project: Project }) {
           !isFinished && !revealed ? "hidden" : revealed ? "mt-0 opacity-95" : "group-hover:mt-0 group-hover:opacity-95"
         } p-2 px-3 text-justify bg-card text-foreground shadow-md`}
       >
-        <p className="text-xs mb-3">{description}</p>
+        <p className="text-xs mb-3 line-clamp-4">{description}</p>
         {Array.isArray(tags) && tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {tags.map((tag: string, index: number) => (
