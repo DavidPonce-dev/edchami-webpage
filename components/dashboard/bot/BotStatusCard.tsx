@@ -10,7 +10,7 @@ interface Props {
 
 function StatusItem({ icon: Icon, label, value, color }: { icon: typeof Cookie; label: string; value: string; color?: string }) {
   return (
-    <div className="flex items-center gap-3 p-3 bubble">
+    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
       <Icon className={`w-5 h-5 ${color || "text-muted-foreground"}`} />
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
@@ -23,9 +23,9 @@ function StatusItem({ icon: Icon, label, value, color }: { icon: typeof Cookie; 
 export function BotStatusCard({ status, error }: Props) {
   if (error) {
     return (
-      <div className="glass rounded-2xl p-6">
+      <div className="bg-card border border-border rounded-lg p-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Estado del bot</h2>
-        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
           <p className="text-sm text-destructive">{error}</p>
           <p className="text-xs text-muted-foreground mt-1">
             Verifique DISCORD_BOT_URL y DISCORD_BOT_TOKEN en su .env
@@ -42,7 +42,7 @@ export function BotStatusCard({ status, error }: Props) {
   const vncColor = status.vncActive ? "text-amber-500" : "text-muted-foreground";
 
   return (
-    <div className="glass rounded-2xl p-6">
+    <div className="bg-card border border-border rounded-lg p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Estado del bot</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
