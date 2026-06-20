@@ -86,11 +86,6 @@ export interface SetupResponse {
   instructions: string;
 }
 
-export interface BrowserCloseResponse {
-  message: string;
-  cookieRefresh: { success: boolean; cookieCount?: number };
-}
-
 export async function getHealth(): Promise<BotHealth> {
   return request<BotHealth>("/health");
 }
@@ -107,24 +102,12 @@ export async function refreshCookies(): Promise<CookieAction> {
   return request<CookieAction>("/api/cookies/refresh", { method: "POST" });
 }
 
-export async function extractCookies(): Promise<CookieAction> {
-  return request<CookieAction>("/api/cookies/extract", { method: "POST" });
-}
-
 export async function setupVNC(): Promise<SetupResponse> {
   return request<SetupResponse>("/api/cookies/setup", { method: "POST" });
 }
 
 export async function stopVNC(): Promise<{ message: string }> {
   return request<{ message: string }>("/api/cookies/setup/stop", { method: "POST" });
-}
-
-export async function startBrowser(): Promise<{ message: string }> {
-  return request<{ message: string }>("/api/browser/start", { method: "POST" });
-}
-
-export async function closeBrowser(): Promise<BrowserCloseResponse> {
-  return request<BrowserCloseResponse>("/api/browser/close", { method: "POST" });
 }
 
 export async function resetProfile(): Promise<{ message: string }> {
