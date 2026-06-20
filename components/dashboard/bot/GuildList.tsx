@@ -158,14 +158,33 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
           </button>
         ) : (
           <>
-            <button
-              onClick={handleBlacklist}
-              disabled={actionLoading !== null || confirmingBlacklist}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 transition-colors"
-            >
-              <ShieldBan className="w-3.5 h-3.5" />
-              {actionLoading === "blacklist" ? "..." : "Blacklist"}
-            </button>
+            {!confirmingBlacklist ? (
+              <button
+                onClick={() => setConfirmingBlacklist(true)}
+                disabled={actionLoading !== null}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 transition-colors"
+              >
+                <ShieldBan className="w-3.5 h-3.5" />
+                {actionLoading === "blacklist" ? "..." : "Blacklist"}
+              </button>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={handleBlacklist}
+                  disabled={actionLoading !== null}
+                  className="px-2 py-1 text-xs font-medium rounded bg-red-500 text-white hover:bg-red-500/90 disabled:opacity-50 transition-colors"
+                >
+                  {actionLoading === "blacklist" ? "..." : "Confirm"}
+                </button>
+                <button
+                  onClick={() => setConfirmingBlacklist(false)}
+                  disabled={actionLoading !== null}
+                  className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
             {!confirmingLeave ? (
               <button
                 onClick={() => setConfirmingLeave(true)}
@@ -186,32 +205,6 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
                 </button>
                 <button
                   onClick={() => setConfirmingLeave(false)}
-                  disabled={actionLoading !== null}
-                  className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-            {!confirmingBlacklist ? (
-              <button
-                onClick={() => setConfirmingBlacklist(true)}
-                disabled={actionLoading !== null}
-                className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
-              >
-                Confirm
-              </button>
-            ) : (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={handleBlacklist}
-                  disabled={actionLoading !== null}
-                  className="px-2 py-1 text-xs font-medium rounded bg-red-500 text-white hover:bg-red-500/90 disabled:opacity-50 transition-colors"
-                >
-                  {actionLoading === "blacklist" ? "..." : "Confirm"}
-                </button>
-                <button
-                  onClick={() => setConfirmingBlacklist(false)}
                   disabled={actionLoading !== null}
                   className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
                 >
