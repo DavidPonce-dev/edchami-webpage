@@ -153,7 +153,18 @@ export interface GuildInfo {
   id: string;
   name: string;
   memberCount: number;
+  blacklisted: boolean;
   music: GuildMusic;
+}
+
+export interface BlacklistEntry {
+  guildId: string;
+  guildName: string;
+  blacklistedAt: string;
+}
+
+export interface BlacklistResponse {
+  blacklist: BlacklistEntry[];
 }
 
 export interface GuildsResponse {
@@ -173,4 +184,20 @@ export async function getGuilds(): Promise<GuildsResponse> {
 
 export async function toggleDeploy(): Promise<DeployToggleResponse> {
   return request<DeployToggleResponse>("/api/bot/toggle", { method: "POST" });
+}
+
+export async function getBlacklist(): Promise<BlacklistResponse> {
+  return request<BlacklistResponse>("/api/blacklist");
+}
+
+export async function blacklistGuild(guildId: string): Promise<{ message: string }> {
+  return request<{ message: string }>(`/api/guild/blacklist?id=${encodeURIComponent(guildId)}`, { method: "POST" });
+}
+
+export async function unblacklistGuild(guildId: string): Promise<{ message: string }> {
+  return request<{ message: string }>(`/api/blacklist/remove?id=${encodeURIComponent(guildId)}`, { method: "POST" });
+}
+
+export async function leaveGuild(guildId: string): Promise<{ message: string }> {
+  return request<{ message: string }>(`/api/guild/leave?id=${encodeURIComponent(guildId)}`, { method: "POST" });
 }

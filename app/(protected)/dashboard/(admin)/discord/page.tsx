@@ -7,6 +7,7 @@ import { CookieManager } from "@/components/dashboard/bot/CookieManager";
 import { ProfileActions } from "@/components/dashboard/bot/ProfileActions";
 import { VNCFrame } from "@/components/dashboard/bot/VNCFrame";
 import { GuildList } from "@/components/dashboard/bot/GuildList";
+import { BlacklistPanel } from "@/components/dashboard/bot/BlacklistPanel";
 import { ActivityLog, LogEntry } from "@/components/dashboard/bot/ActivityLog";
 import { toast } from "sonner";
 
@@ -100,7 +101,7 @@ export default function DiscordDashboardPage() {
         </p>
       </div>
 
-      <BotStatusCard status={status} error={error} onRefresh={loadStatus} loading={loading !== null} />
+      <BotStatusCard status={status} error={error} />
 
       <CookieManager
         vncActive={status?.vncActive || false}
@@ -113,6 +114,8 @@ export default function DiscordDashboardPage() {
       {showVNC && <VNCFrame onClose={handleStopVNC} />}
 
       <GuildList />
+
+      <BlacklistPanel />
 
       <ActivityLog entries={logs} onClear={handleClearLog} />
 
