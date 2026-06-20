@@ -1,24 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Server, Music, Play, Pause, Repeat, Shuffle, Power, Users, Volume2, ChevronDown, ChevronUp, LogOut, ShieldBan, ShieldCheck } from "lucide-react";
-import { GuildInfo, GuildsResponse, blacklistGuild, unblacklistGuild, leaveGuild } from "@/lib/bot-client";
+import { Server, Music, Pause, Repeat, Shuffle, Power, Users, Volume2, ChevronDown, ChevronUp, LogOut, ShieldBan, ShieldCheck } from "lucide-react";
+import { GuildInfo } from "@/lib/bot-client";
+import { useGuilds, useDeployToggle, useBlacklistGuild, useUnblacklistGuild, useLeaveGuild } from "@/lib/bot-queries";
 import { toast } from "sonner";
-
-async function fetchGuilds(): Promise<GuildsResponse> {
-  const res = await fetch("/api/bot/api/guilds");
-  if (!res.ok) throw new Error(`Failed to fetch guilds: ${res.status}`);
-  return res.json();
-}
-
-async function postToggle(): Promise<{ deployMode: boolean; message: string }> {
-  const res = await fetch("/api/bot/api/bot/toggle", { method: "POST" });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Toggle failed: ${res.status}`);
-  }
-  return res.json();
-}
+import { useState } from "react";
 
 function formatTime(seconds: number | null): string {
   if (seconds == null) return "0:00";
@@ -27,51 +13,42 @@ function formatTime(seconds: number | null): string {
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void }) {
+function GuildCard({ guild }: { guild: GuildInfo }) {
   const m = guild.music;
   const [confirmingLeave, setConfirmingLeave] = useState(false);
   const [confirmingBlacklist, setConfirmingBlacklist] = useState(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const blacklistGuild = useBlacklistGuild();
+  const unblacklistGuild = useUnblacklistGuild();
+  const leaveGuild = useLeaveGuild();
+
+  const actionLoading =
+    blacklistGuild.isPending || unblacklistGuild.isPending || leaveGuild.isPending;
 
   const handleLeave = async () => {
-    setActionLoading("leave");
-    try {
-      await leaveGuild(guild.id);
-      toast.success(`Left ${guild.name}`);
-      onAction();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to leave guild");
-    } finally {
-      setActionLoading(null);
-      setConfirmingLeave(false);
-    }
+    leaveGuild.mutate(guild.id, {
+      onSuccess: () => {
+        toast.success(`Left ${guild.name}`);
+        setConfirmingLeave(false);
+      },
+    });
   };
 
   const handleBlacklist = async () => {
-    setActionLoading("blacklist");
-    try {
-      await blacklistGuild(guild.id);
-      toast.success(`Blacklisted ${guild.name}`);
-      onAction();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to blacklist guild");
-    } finally {
-      setActionLoading(null);
-      setConfirmingBlacklist(false);
-    }
+    blacklistGuild.mutate(guild.id, {
+      onSuccess: () => {
+        toast.success(`Blacklisted ${guild.name}`);
+        setConfirmingBlacklist(false);
+      },
+    });
   };
 
   const handleUnblacklist = async () => {
-    setActionLoading("unblacklist");
-    try {
-      await unblacklistGuild(guild.id);
-      toast.success(`Removed ${guild.name} from blacklist`);
-      onAction();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to unblacklist guild");
-    } finally {
-      setActionLoading(null);
-    }
+    unblacklistGuild.mutate(guild.id, {
+      onSuccess: () => {
+        toast.success(`Removed ${guild.name} from blacklist`);
+      },
+    });
   };
 
   return (
@@ -150,35 +127,35 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
         {guild.blacklisted ? (
           <button
             onClick={handleUnblacklist}
-            disabled={actionLoading !== null}
+            disabled={actionLoading}
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50 transition-colors"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            {actionLoading === "unblacklist" ? "..." : "Unblacklist"}
+            {unblacklistGuild.isPending ? "..." : "Unblacklist"}
           </button>
         ) : (
           <>
             {!confirmingBlacklist ? (
               <button
                 onClick={() => setConfirmingBlacklist(true)}
-                disabled={actionLoading !== null}
+                disabled={actionLoading}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 disabled:opacity-50 transition-colors"
               >
                 <ShieldBan className="w-3.5 h-3.5" />
-                {actionLoading === "blacklist" ? "..." : "Blacklist"}
+                {blacklistGuild.isPending ? "..." : "Blacklist"}
               </button>
             ) : (
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleBlacklist}
-                  disabled={actionLoading !== null}
+                  disabled={actionLoading}
                   className="px-2 py-1 text-xs font-medium rounded bg-red-500 text-white hover:bg-red-500/90 disabled:opacity-50 transition-colors"
                 >
-                  {actionLoading === "blacklist" ? "..." : "Confirm"}
+                  {blacklistGuild.isPending ? "..." : "Confirm"}
                 </button>
                 <button
                   onClick={() => setConfirmingBlacklist(false)}
-                  disabled={actionLoading !== null}
+                  disabled={actionLoading}
                   className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
                 >
                   Cancel
@@ -188,7 +165,7 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
             {!confirmingLeave ? (
               <button
                 onClick={() => setConfirmingLeave(true)}
-                disabled={actionLoading !== null}
+                disabled={actionLoading}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-destructive/10 text-destructive hover:bg-destructive/20 disabled:opacity-50 transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -198,14 +175,14 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleLeave}
-                  disabled={actionLoading !== null}
+                  disabled={actionLoading}
                   className="px-2 py-1 text-xs font-medium rounded bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 transition-colors"
                 >
-                  {actionLoading === "leave" ? "..." : "Confirm"}
+                  {leaveGuild.isPending ? "..." : "Confirm"}
                 </button>
                 <button
                   onClick={() => setConfirmingLeave(false)}
-                  disabled={actionLoading !== null}
+                  disabled={actionLoading}
                   className="px-2 py-1 text-xs font-medium rounded bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50 transition-colors"
                 >
                   Cancel
@@ -219,53 +196,13 @@ function GuildCard({ guild, onAction }: { guild: GuildInfo; onAction: () => void
   );
 }
 
-export function GuildList({ onGuildChange }: { onGuildChange?: () => void }) {
-  const [guilds, setGuilds] = useState<GuildInfo[]>([]);
-  const [deployMode, setDeployMode] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function GuildList() {
+  const { data, isLoading, error } = useGuilds();
+  const deployToggle = useDeployToggle();
   const [isOpen, setIsOpen] = useState(true);
 
-  const loadGuilds = useCallback(async () => {
-    try {
-      const data = await fetchGuilds();
-      setGuilds(data.guilds);
-      setDeployMode(data.deployMode);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    }
-  }, []);
-
-  useEffect(() => {
-    loadGuilds();
-  }, [loadGuilds]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      loadGuilds();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [loadGuilds]);
-
-  const handleToggle = async () => {
-    setLoading(true);
-    try {
-      const result = await postToggle();
-      setDeployMode(result.deployMode);
-      toast.success(result.message);
-      await loadGuilds();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Toggle failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGuildAction = useCallback(() => {
-    loadGuilds();
-    onGuildChange?.();
-  }, [loadGuilds, onGuildChange]);
+  const guilds = data?.guilds ?? [];
+  const deployMode = data?.deployMode ?? false;
 
   if (error && guilds.length === 0) {
     return (
@@ -277,7 +214,9 @@ export function GuildList({ onGuildChange }: { onGuildChange?: () => void }) {
           </div>
         </div>
         <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <p className="text-sm text-destructive">{error}</p>
+          <p className="text-sm text-destructive">
+            {error instanceof Error ? error.message : "Error desconocido"}
+          </p>
         </div>
       </div>
     );
@@ -307,8 +246,8 @@ export function GuildList({ onGuildChange }: { onGuildChange?: () => void }) {
               </span>
             </div>
             <button
-              onClick={handleToggle}
-              disabled={loading}
+              onClick={() => deployToggle.mutate()}
+              disabled={deployToggle.isPending}
               className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors disabled:opacity-50 ${
                 deployMode
                   ? "bg-green-500/20 text-green-400 hover:bg-green-500/30"
@@ -316,16 +255,18 @@ export function GuildList({ onGuildChange }: { onGuildChange?: () => void }) {
               }`}
             >
               <Power className="w-3.5 h-3.5" />
-              {loading ? "Processing..." : deployMode ? "Enable Service" : "Disable Service"}
+              {deployToggle.isPending ? "Processing..." : deployMode ? "Enable Service" : "Disable Service"}
             </button>
           </div>
 
-          {guilds.length === 0 ? (
+          {isLoading && guilds.length === 0 ? (
+            <p className="text-muted-foreground text-sm text-center py-4 italic">Cargando servidores...</p>
+          ) : guilds.length === 0 ? (
             <p className="text-muted-foreground text-sm text-center py-4 italic">No servers found</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {guilds.map((g) => (
-                <GuildCard key={g.id} guild={g} onAction={handleGuildAction} />
+                <GuildCard key={g.id} guild={g} />
               ))}
             </div>
           )}

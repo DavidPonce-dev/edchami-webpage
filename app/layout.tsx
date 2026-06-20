@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PersonSchema } from "@/components/seo/PersonSchema";
 import { WebsiteSchema } from "@/components/seo/WebsiteSchema";
 import { AuthProvider } from "@/hooks/useAuth";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 import { getSession } from "@/lib/auth";
 import { getBaseUrl } from "@/lib/utils/getBaseUrl";
@@ -125,6 +126,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <QueryProvider>
           <AuthProvider initialUser={user}>
             <PersonSchema />
             <WebsiteSchema />
@@ -138,6 +140,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </div>
           <Footer />
         </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

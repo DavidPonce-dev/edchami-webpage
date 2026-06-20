@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { BotStatus } from "@/lib/bot-client";
+import { useState, useCallback } from "react";
 import { BotStatusCard } from "@/components/dashboard/bot/BotStatusCard";
 import { CookieManager } from "@/components/dashboard/bot/CookieManager";
 import { ProfileActions } from "@/components/dashboard/bot/ProfileActions";
@@ -9,31 +8,19 @@ import { VNCFrame } from "@/components/dashboard/bot/VNCFrame";
 import { GuildList } from "@/components/dashboard/bot/GuildList";
 import { BlacklistPanel } from "@/components/dashboard/bot/BlacklistPanel";
 import { ActivityLog, LogEntry } from "@/components/dashboard/bot/ActivityLog";
-import { toast } from "sonner";
-
-async function fetchStatus(): Promise<BotStatus> {
-  const res = await fetch("/api/bot/api/status");
-  if (!res.ok) throw new Error(`Failed to fetch status: ${res.status}`);
-  return res.json();
-}
-
-async function postAction(path: string) {
-  const res = await fetch(`/api/bot/${path}`, { method: "POST" });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || `Action failed: ${res.status}`);
-  }
-  return res.json();
-}
+import {
+  useBotStatus,
+  useRefreshCookies,
+  useSetupVNC,
+  useStopVNC,
+  useResetProfile,
+} from "@/lib/bot-queries";
 
 function ts() {
   return new Date().toLocaleTimeString();
 }
 
 export default function DiscordDashboardPage() {
-  const [status, setStatus] = useState<BotStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [showVNC, setShowVNC] = useState(false);
 
@@ -41,56 +28,55 @@ export default function DiscordDashboardPage() {
     setLogs((prev) => [...prev, { timestamp: ts(), message }]);
   }, []);
 
-  const loadStatus = useCallback(async () => {
-    try {
-      const data = await fetchStatus();
-      setStatus(data);
-      setError(null);
-      addLog(
-        `Estado: cookies=${data.cookiesValid ? "válidas" : "inválidas"} cantidad=${data.cookieCount} navegador=${data.browserActive ? "activo" : "inactivo"} vnc=${data.vncActive ? "activo" : "inactivo"}`,
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    }
-  }, [addLog]);
+  const { data: status, error: statusError } = useBotStatus();
 
-  useEffect(() => {
-    loadStatus();
-  }, [loadStatus]);
+  const refreshCookies = useRefreshCookies(() =>
+    addLog("Cookies actualizadas correctamente")
+  );
+  const setupVNC = useSetupVNC(() => addLog("Sesión VNC iniciada"));
+  const stopVNC = useStopVNC(() => addLog("Sesión VNC detenida"));
+  const resetProfile = useResetProfile(() =>
+    addLog("Perfil del navegador restablecido")
+  );
 
-  const withLoading = async (action: string, fn: () => Promise<unknown>, startMsg: string, successMsg: string): Promise<void> => {
-    setLoading(action);
-    addLog(startMsg);
-    try {
-      const result = await fn();
-      addLog(`Resultado: ${JSON.stringify(result)}`);
-      toast.success(successMsg);
-      await loadStatus();
-    } catch (err) {
-      addLog(`Error: ${err instanceof Error ? err.message : "Acción fallida"}`);
-      toast.error(err instanceof Error ? err.message : "Acción fallida");
-    } finally {
-      setLoading(null);
-    }
+  const handleRefreshCookies = async () => {
+    addLog("Actualizando cookies...");
+    refreshCookies.mutate(undefined);
   };
-
-  const handleRefreshCookies = () =>
-    withLoading("refresh", () => postAction("api/cookies/refresh"), "Actualizando cookies...", "Cookies actualizadas correctamente");
 
   const handleSetupVNC = async () => {
     setShowVNC(true);
-    return withLoading("setup", () => postAction("api/cookies/setup"), "Iniciando sesión VNC...", "Sesión VNC iniciada");
+    addLog("Iniciando sesión VNC...");
+    setupVNC.mutate(undefined);
   };
 
   const handleStopVNC = async () => {
     setShowVNC(false);
-    return withLoading("stop", () => postAction("api/cookies/setup/stop"), "Deteniendo VNC...", "Sesión VNC detenida");
+    addLog("Deteniendo VNC...");
+    stopVNC.mutate(undefined);
   };
 
-  const handleResetProfile = () =>
-    withLoading("reset", () => postAction("api/profile/reset"), "Restableciendo perfil del navegador...", "Perfil restablecido correctamente");
+  const handleResetProfile = async () => {
+    addLog("Restableciendo perfil del navegador...");
+    resetProfile.mutate(undefined);
+  };
 
   const handleClearLog = () => setLogs([]);
+
+  // Determinar qué acción está en curso para pasársela a CookieManager
+  const loading =
+    refreshCookies.isPending
+      ? "refresh"
+      : setupVNC.isPending
+        ? "setup"
+        : stopVNC.isPending
+          ? "stop"
+          : resetProfile.isPending
+            ? "reset"
+            : null;
+
+  const statusErrorMessage =
+    statusError instanceof Error ? statusError.message : null;
 
   return (
     <div className="p-6 space-y-6">
@@ -101,10 +87,10 @@ export default function DiscordDashboardPage() {
         </p>
       </div>
 
-      <BotStatusCard status={status} error={error} />
+      <BotStatusCard status={status ?? null} error={statusErrorMessage} />
 
       <CookieManager
-        vncActive={status?.vncActive || false}
+        vncActive={status?.vncActive ?? false}
         onRefreshCookies={handleRefreshCookies}
         onSetupVNC={handleSetupVNC}
         onStopVNC={handleStopVNC}
@@ -119,7 +105,10 @@ export default function DiscordDashboardPage() {
 
       <ActivityLog entries={logs} onClear={handleClearLog} />
 
-      <ProfileActions onReset={handleResetProfile} loading={loading === "reset"} />
+      <ProfileActions
+        onReset={handleResetProfile}
+        loading={resetProfile.isPending}
+      />
     </div>
   );
 }

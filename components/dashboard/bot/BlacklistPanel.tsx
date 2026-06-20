@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { ShieldBan, ShieldCheck, ChevronDown, ChevronUp } from "lucide-react";
-import { BlacklistEntry, getBlacklist, unblacklistGuild } from "@/lib/bot-client";
+import { BlacklistEntry } from "@/lib/bot-client";
+import { useBlacklist, useUnblacklistGuild } from "@/lib/bot-queries";
 import { toast } from "sonner";
 
 interface Props {
@@ -10,39 +11,19 @@ interface Props {
 }
 
 export function BlacklistPanel({ onBlacklistChange }: Props) {
-  const [entries, setEntries] = useState<BlacklistEntry[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data, isLoading } = useBlacklist();
+  const unblacklist = useUnblacklistGuild();
   const [isOpen, setIsOpen] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const loadBlacklist = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getBlacklist();
-      setEntries(data.blacklist);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load blacklist");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const entries: BlacklistEntry[] = data?.blacklist ?? [];
 
-  useEffect(() => {
-    loadBlacklist();
-  }, [loadBlacklist]);
-
-  const handleUnblacklist = async (guildId: string, guildName: string) => {
-    setActionLoading(guildId);
-    try {
-      await unblacklistGuild(guildId);
-      toast.success(`Removed ${guildName} from blacklist`);
-      setEntries((prev) => prev.filter((e) => e.guildId !== guildId));
-      onBlacklistChange?.();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to unblacklist");
-    } finally {
-      setActionLoading(null);
-    }
+  const handleUnblacklist = (guildId: string, guildName: string) => {
+    unblacklist.mutate(guildId, {
+      onSuccess: () => {
+        toast.success(`Removed ${guildName} from blacklist`);
+        onBlacklistChange?.();
+      },
+    });
   };
 
   return (
@@ -61,7 +42,7 @@ export function BlacklistPanel({ onBlacklistChange }: Props) {
 
       {isOpen && (
         <div className="px-6 pb-6">
-          {loading ? (
+          {isLoading && entries.length === 0 ? (
             <p className="text-muted-foreground text-sm text-center py-4 italic">Cargando...</p>
           ) : entries.length === 0 ? (
             <p className="text-muted-foreground text-sm text-center py-4 italic">No hay servidores blacklisteados</p>
@@ -80,11 +61,13 @@ export function BlacklistPanel({ onBlacklistChange }: Props) {
                   </div>
                   <button
                     onClick={() => handleUnblacklist(entry.guildId, entry.guildName)}
-                    disabled={actionLoading === entry.guildId}
+                    disabled={unblacklist.isPending && unblacklist.variables === entry.guildId}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50 transition-colors"
                   >
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    {actionLoading === entry.guildId ? "..." : "Quitar blacklist"}
+                    {unblacklist.isPending && unblacklist.variables === entry.guildId
+                      ? "..."
+                      : "Quitar blacklist"}
                   </button>
                 </div>
               ))}
