@@ -141,6 +141,21 @@ export function useStopVNC(onSuccess?: () => void) {
   });
 }
 
+export function useDeleteCookies(onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => postAction("api/cookies/delete"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: botKeys.status() });
+      toast.success("Cookies eliminadas correctamente");
+      onSuccess?.();
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Error al eliminar cookies");
+    },
+  });
+}
+
 export function useResetProfile(onSuccess?: () => void) {
   const queryClient = useQueryClient();
   return useMutation({

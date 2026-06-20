@@ -13,7 +13,6 @@ import {
   useRefreshCookies,
   useSetupVNC,
   useStopVNC,
-  useResetProfile,
 } from "@/lib/bot-queries";
 
 function ts() {
@@ -35,9 +34,6 @@ export default function DiscordDashboardPage() {
   );
   const setupVNC = useSetupVNC(() => addLog("Sesión VNC iniciada"));
   const stopVNC = useStopVNC(() => addLog("Sesión VNC detenida"));
-  const resetProfile = useResetProfile(() =>
-    addLog("Perfil del navegador restablecido")
-  );
 
   const handleRefreshCookies = async () => {
     addLog("Actualizando cookies...");
@@ -56,14 +52,8 @@ export default function DiscordDashboardPage() {
     stopVNC.mutate(undefined);
   };
 
-  const handleResetProfile = async () => {
-    addLog("Restableciendo perfil del navegador...");
-    resetProfile.mutate(undefined);
-  };
-
   const handleClearLog = () => setLogs([]);
 
-  // Determinar qué acción está en curso para pasársela a CookieManager
   const loading =
     refreshCookies.isPending
       ? "refresh"
@@ -71,9 +61,7 @@ export default function DiscordDashboardPage() {
         ? "setup"
         : stopVNC.isPending
           ? "stop"
-          : resetProfile.isPending
-            ? "reset"
-            : null;
+          : null;
 
   const statusErrorMessage =
     statusError instanceof Error ? statusError.message : null;
@@ -105,10 +93,7 @@ export default function DiscordDashboardPage() {
 
       <ActivityLog entries={logs} onClear={handleClearLog} />
 
-      <ProfileActions
-        onReset={handleResetProfile}
-        loading={resetProfile.isPending}
-      />
+      <ProfileActions />
     </div>
   );
 }
